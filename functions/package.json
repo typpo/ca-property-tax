@@ -1,0 +1,12 @@
+{
+  "name": "ca-property-tax",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Ian Webster",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parse": "^4.12.0",
+    "geokdbush": "^1.1.0",
+    "kdbush": "^3.0.0"
+  }
+}
