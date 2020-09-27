@@ -1,0 +1,102 @@
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+<style>
+body {
+  margin: 0;
+}
+#map { height: 100%; width: 100%; }
+
+.maplabel {
+  font-size: 13px;
+  font-weight: bold;
+  padding: 3px;
+}
+
+.tax-high {
+  color: red;
+}
+
+.tax-low {
+  color: green;
+}
+</style>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+ integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+<script>
+  let markers = undefined;
+  let markerLayer = undefined;
+
+  async function loadMarkers() {
+    const center = map.getCenter();
+    const resp = await fetch(`http://localhost:13000/lookup?lat=${center.lat}&lng=${center.lng}`);
+    const data = await resp.json();
+
+    if (data.results.length < 1) {
+      return;
+    }
+
+    if (markerLayer) {
+      markerLayer.clearLayers();
+      map.removeLayer(markerLayer);
+    }
+
+    const taxes = [];
+    data.results.forEach(record => {
+      taxes.push(record.tax);
+    });
+    taxes.sort((a,b) => a-b);
+
+    const topPercentile = taxes[Math.ceil(taxes.length * .9) - 1];
+    const bottomPercentile= taxes[Math.ceil(taxes.length * .1) - 1];
+
+    markers = [];
+    data.results.forEach(record => {
+      const marker = new L.marker([record.lat, record.lng], { opacity: 0.01 });
+
+      let taxclass = '';
+      if (record.tax >= topPercentile) {
+        taxclass = 'high';
+      } else if (record.tax <= bottomPercentile) {
+        taxclass = 'low';
+      }
+
+      marker.bindTooltip(`$${record.tax.toLocaleString()}`, {
+        permanent: true,
+        className: `maplabel tax-${taxclass}`,
+        direction: 'center',
+        interactive: true,
+      });
+      const urlStr = encodeURIComponent(`${record.number} ${record.street}`);
+      const popupContent = `
+        <center>
+          <h2>${record.number} ${record.street}</h2>
+          2019 tax assessment: $${Math.floor(record.tax).toLocaleString()}
+        </center>
+        <br>
+        <br>
+        <a target="_blank" href="https://sanmateo-ca.county-taxes.com/public/search?search_query=${urlStr}&category=all">Tax records</a>
+        &middot;
+        <a target="_blank" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${record.lat},${record.lng}">Street view</a>
+        &middot;
+        <a target="_blank" href="https://www.google.com/search?q=${urlStr}+site%3Azillow.com">Real estate</a>
+      `;
+      marker.bindPopup(popupContent);
+      markers.push(marker);
+    });
+
+    markerLayer = L.layerGroup(markers).addTo(map);
+  }
+
+  const map = L.map('map').setView([37.5630, -122.3255], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	maxZoom: 19,
+	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+  map.on('moveend', loadMarkers);
+</script>

@@ -23,7 +23,7 @@ class GeoIndex {
       if (tax <= 0) {
         continue;
       }
-      points.push({ number, street, tax: parseFloat(tax), lat, lng });
+      points.push({ number, street, tax: parseFloat(tax), lat: parseFloat(lat), lng: parseFloat(lng) });
     }
 
     this.index = new KdBush(points, p => p.lng, p => p.lat);
@@ -41,6 +41,8 @@ class GeoIndex {
         number: loc.number,
         street: loc.street,
         tax: loc.tax,
+        lat: loc.lat,
+        lng: loc.lng,
       };
     });
   }
