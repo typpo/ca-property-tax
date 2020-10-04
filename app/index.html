@@ -1,6 +1,8 @@
  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
    crossorigin=""/>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css" integrity="sha512-RLEjtaFGdC4iQMJDbMzim/dOvAu+8Qp9sw7QE4wIMYcg2goVoivzwgSZq9CsIxp4xKAZPKh5J2f2lOko2Ze6FQ==" crossorigin="anonymous" />
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" integrity="sha512-BBToHPBStgMiw0lD4AtkRIZmdndhB6aQbXpX7omcrXeG2PauGBl2lzq2xUZTxaLxYz5IDHlmneCZ1IJ+P3kYtQ==" crossorigin="anonymous" />
 <style>
 body {
   margin: 0;
@@ -9,7 +11,6 @@ body {
 
 .maplabel {
   font-size: 13px;
-  font-weight: bold;
   padding: 3px;
 }
 
@@ -20,6 +21,12 @@ body {
 .tax-low {
   color: green;
 }
+
+.marker-cluster span {
+  font-size: 13px;
+  margin-left: -0.5em;
+  white-space: nowrap;
+}
 </style>
 
 <div id="map"></div>
@@ -27,69 +34,177 @@ body {
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
    crossorigin=""></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js" integrity="sha512-MQlyPV+ol2lp4KodaU/Xmrn+txc1TP15pOBF/2Sfre7MRsA/pB4Vy58bEqe9u7a7DczMLtU5wT8n7OblJepKbg==" crossorigin="anonymous"></script>
 <script>
+  class LRU {
+    constructor(max = 10) {
+        this.max = max;
+        this.cache = new Map();
+    }
+
+    get(key) {
+        let item = this.cache.get(key);
+        if (item) {
+            // refresh key
+            this.cache.delete(key);
+            this.cache.set(key, item);
+        }
+        return item;
+    }
+
+    set(key, val) {
+        // refresh key
+        if (this.cache.has(key)) this.cache.delete(key);
+        // evict oldest
+        else if (this.cache.size == this.max) this.cache.delete(this.first());
+        this.cache.set(key, val);
+    }
+
+    first() {
+        return this.cache.keys().next().value;
+    }
+  }
+
   let markers = undefined;
   let markerLayer = undefined;
 
+  const apnToMarkerCache = new LRU(10000);
+
+  const markerGroups = L.markerClusterGroup({
+    //disableClusteringAtZoom: 19,
+    maxClusterRadius: (zoom) => {
+      if (zoom >= 18) {
+        return 20;
+      }
+      if (zoom > 16) {
+        return 80;
+      }
+      return 120;
+    },
+    removeOutsideVisibleBounds: true,
+    animate: false,
+    iconCreateFunction: (cluster) => {
+      /*
+      var childCount = cluster.getChildCount();
+
+      var c = ' marker-cluster-';
+      if (childCount < 10) {
+        c += 'small';
+      } else if (childCount < 100) {
+        c += 'medium';
+      } else {
+        c += 'large';
+      }
+      */
+      c = ' marker-cluster-medium';
+
+      let minTax = Number.POSITIVE_INFINITY;
+      let maxTax = Number.NEGATIVE_INFINITY;
+      const markers = cluster.getAllChildMarkers().forEach(marker => {
+        minTax = Math.min(marker.record.tax, minTax);
+        maxTax = Math.max(marker.record.tax, maxTax);
+      });
+
+      const minTaxStr = Math.round(minTax / 1000).toLocaleString();
+      const maxTaxStr = Math.round(maxTax / 1000).toLocaleString();
+      return new L.DivIcon({ html: `<div><span>$${minTaxStr}-${maxTaxStr}k</span></div>`, className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+    }
+  });
+  markerGroups._getExpandedVisibleBounds = function () {
+    return map.getBounds();
+  };
+
   async function loadMarkers() {
+    const zoom = map.getZoom();
     const center = map.getCenter();
-    const resp = await fetch(`http://localhost:13000/lookup?lat=${center.lat}&lng=${center.lng}`);
+    const bounds = map.getBounds();
+
+    const bottomLeft = bounds.getSouthWest();
+    const topRight = bounds.getNorthEast();
+
+    const minX = bottomLeft.lng;
+    const minY = bottomLeft.lat;
+    const maxX = topRight.lng;
+    const maxY = topRight.lat;
+
+    const resp = await fetch(`/lookup?lat=${center.lat}&lng=${center.lng}&minX=${minX}&minY=${minY}&maxX=${maxX}&maxY=${maxY}&zoom=${zoom}`);
     const data = await resp.json();
 
     if (data.results.length < 1) {
       return;
     }
 
+    /*
     if (markerLayer) {
       markerLayer.clearLayers();
       map.removeLayer(markerLayer);
     }
+    */
+
+    const records = data.results.map(result => {
+      const [address, apn, tax, lat, lng] = result;
+      return { address, apn, tax, lat, lng, };
+    });
 
     const taxes = [];
-    data.results.forEach(record => {
+    records.forEach(record => {
       taxes.push(record.tax);
     });
     taxes.sort((a,b) => a-b);
 
     const topPercentile = taxes[Math.ceil(taxes.length * .9) - 1];
-    const bottomPercentile= taxes[Math.ceil(taxes.length * .1) - 1];
+    const bottomPercentile = taxes[Math.ceil(taxes.length * .1) - 1];
 
     markers = [];
-    data.results.forEach(record => {
-      const marker = new L.marker([record.lat, record.lng], { opacity: 0.01 });
+    records.forEach(record => {
+      let marker = apnToMarkerCache.get(record.apn);
+      if (marker) {
+        // Tooltip is going to get updated
+        //marker.unbindTooltip();
+      } else {
+        marker = new L.marker([record.lat, record.lng], { opacity: 0.01 });
+        marker.record = record;
+        apnToMarkerCache.set(record.apn, marker);
 
-      let taxclass = '';
-      if (record.tax >= topPercentile) {
-        taxclass = 'high';
-      } else if (record.tax <= bottomPercentile) {
-        taxclass = 'low';
+        const popupContent = `
+          <center>
+            <h2>${record.address}</h2>
+            Tax assessment: $${Math.round(record.tax).toLocaleString()}
+          </center>
+          <br>
+          <br>
+          <a target="_blank" href="https://sanmateo-ca.county-taxes.com/public/search?search_query=${record.apn}&category=all">Tax records</a>
+          &middot;
+          <a target="_blank" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${record.lat},${record.lng}">Street view</a>
+          &middot;
+          <a target="_blank" href="https://www.google.com/search?q=${encodeURIComponent(record.address)}+site%3Azillow.com">Real estate</a>
+        `;
+        marker.bindPopup(popupContent);
+        let taxclass = '';
+        if (record.tax >= topPercentile) {
+          taxclass = 'high';
+        } else if (record.tax <= bottomPercentile) {
+          taxclass = 'low';
+        }
+
+        marker.bindTooltip(`$${Math.round(record.tax).toLocaleString()}`, {
+          permanent: true,
+          className: `maplabel tax-${taxclass}`,
+          direction: 'center',
+          interactive: true,
+        });
       }
 
-      marker.bindTooltip(`$${record.tax.toLocaleString()}`, {
-        permanent: true,
-        className: `maplabel tax-${taxclass}`,
-        direction: 'center',
-        interactive: true,
-      });
-      const urlStr = encodeURIComponent(`${record.number} ${record.street}`);
-      const popupContent = `
-        <center>
-          <h2>${record.number} ${record.street}</h2>
-          2019 tax assessment: $${Math.floor(record.tax).toLocaleString()}
-        </center>
-        <br>
-        <br>
-        <a target="_blank" href="https://sanmateo-ca.county-taxes.com/public/search?search_query=${urlStr}&category=all">Tax records</a>
-        &middot;
-        <a target="_blank" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${record.lat},${record.lng}">Street view</a>
-        &middot;
-        <a target="_blank" href="https://www.google.com/search?q=${urlStr}+site%3Azillow.com">Real estate</a>
-      `;
-      marker.bindPopup(popupContent);
       markers.push(marker);
     });
 
-    markerLayer = L.layerGroup(markers).addTo(map);
+    //markerLayer = L.layerGroup(markers).addTo(map);
+    //markerLayer = L.layerGroup(markers);
+
+    markerGroups.clearLayers();
+    markerGroups.addLayers(markers, {
+      chunkedLoading: true,
+    });
   }
 
   const map = L.map('map').setView([37.5630, -122.3255], 14);
@@ -99,4 +214,5 @@ body {
 }).addTo(map);
 
   map.on('moveend', loadMarkers);
+  map.addLayer(markerGroups);
 </script>
