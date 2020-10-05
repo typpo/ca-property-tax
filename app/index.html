@@ -252,9 +252,10 @@ body {
   }
 
   const map = L.map('map').setView([initialLat, initialLng], initialZoom);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  // https://gis.stackexchange.com/questions/225098/using-google-maps-static-tiles-with-leaflet
+  L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
 	maxZoom: 19,
-	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	subdomains:['mt0','mt1','mt2','mt3'],
 }).addTo(map);
 
   map.on('moveend', function() {
