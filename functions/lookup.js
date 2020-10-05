@@ -34,7 +34,7 @@ class GeoIndex {
     const points = [];
     for await (const record of parser) {
       const [address, apn, lng, lat, tax] = record;
-      if (tax <= 0 || !address) {
+      if (tax <= 0 || !address || address === 'UNKNOWN') {
         continue;
       }
       points.push({ address, apn, tax: parseFloat(tax), lat: parseFloat(lat), lng: parseFloat(lng) });
