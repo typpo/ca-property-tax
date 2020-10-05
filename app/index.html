@@ -253,9 +253,8 @@ body {
 
   const map = L.map('map').setView([initialLat, initialLng], initialZoom);
   // https://gis.stackexchange.com/questions/225098/using-google-maps-static-tiles-with-leaflet
-  L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}.png', {
 	maxZoom: 19,
-	subdomains:['mt0','mt1','mt2','mt3'],
 }).addTo(map);
 
   map.on('moveend', function() {
