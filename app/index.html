@@ -207,12 +207,32 @@ body {
     });
   }
 
-  const map = L.map('map').setView([37.5630, -122.3255], 14);
+  let initialLat = 37.5630;
+  let initialLng = -122.3255;
+  let initialZoom = 14;
+
+  if (window.location.hash) {
+    const ss = window.location.hash.slice(1).split(',');
+    if (ss.length === 3) {
+      initialLat = parseFloat(ss[0]);
+      initialLng = parseFloat(ss[1]);
+      initialZoom = parseFloat(ss[2]);
+    }
+  }
+
+  const map = L.map('map').setView([initialLat, initialLng], initialZoom);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 19,
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-  map.on('moveend', loadMarkers);
+  map.on('moveend', function() {
+    const zoom = map.getZoom();
+    const center = map.getCenter();
+    window.location.replace(`#${center.lat},${center.lng},${zoom}`);
+    loadMarkers();
+  });
   map.addLayer(markerGroups);
+
+  loadMarkers();
 </script>
