@@ -10,32 +10,50 @@ body {
 #map { height: 100%; width: 100%; }
 
 .maplabel {
-  font-size: 12px;
-  padding: 3px;
-  color: #666;
+  font-size: 14px;
+  padding: 0px 6px;
+  color: #fff;
+  background-color: #404040;
+  border-color: #404040;
+  font-weight: bold;
+  border-radius: 10px;
 }
 
 .tax-high {
-  color: #f34336;
-  font-size: 15px;
+  color: #fff;
+  background-color: #f34336;
+  border-color: #f34336;
   font-weight: bold;
 }
 
 .tax-low {
-  color: #4caf4f;
-  font-size: 15px;
+  color: #fff;
+  background-color: #4caf4f;
+  border-color: #4caf4f;
   font-weight: bold;
 }
 
 .marker-cluster div {
-  background-color: #ffc107;
+  background-color: #ffdd78;
+    padding: 4px;
 }
 
 .marker-cluster span {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: bold;
   margin-left: -0.5em;
   white-space: nowrap;
+
+  /*
+  font-size: 14px;
+    font-weight: bold;
+    margin-left: -0.5em;
+    white-space: nowrap;
+    background-color: #909090;
+    color: #fff;
+    padding: 3px 7px;
+    border-radius: 8px;
+      */
 }
 </style>
 
@@ -106,7 +124,8 @@ body {
         c += 'large';
       }
       */
-      c = ' marker-cluster-medium';
+      //c = ' marker-cluster-medium';
+      c='';
 
       let minTax = Number.POSITIVE_INFINITY;
       let maxTax = Number.NEGATIVE_INFINITY;
@@ -176,10 +195,12 @@ body {
         marker.record = record;
         apnToMarkerCache.set(record.apn, marker);
 
+        const abbreviated = ((Math.round(record.tax / 100.0) * 100.0) / 1000.0).toLocaleString();
+
         const popupContent = `
           <center>
             <h2>${record.address}</h2>
-            Tax assessment: $${Math.round(record.tax).toLocaleString()}
+            Tax assessment: <strong>$${Math.round(record.tax).toLocaleString()}</strong>
           </center>
           <br>
           <br>
@@ -197,7 +218,7 @@ body {
           taxclass = 'low';
         }
 
-        marker.bindTooltip(`$${Math.round(record.tax).toLocaleString()}`, {
+        marker.bindTooltip(`${abbreviated}k`, {
           permanent: true,
           className: `maplabel tax-${taxclass}`,
           direction: 'center',
