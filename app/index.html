@@ -127,7 +127,7 @@ body {
     const maxX = topRight.lng;
     const maxY = topRight.lat;
 
-    const resp = await fetch(`/lookup?lat=${center.lat}&lng=${center.lng}&minX=${minX}&minY=${minY}&maxX=${maxX}&maxY=${maxY}&zoom=${zoom}`);
+    const resp = await fetch(`lookup?lat=${center.lat}&lng=${center.lng}&minX=${minX}&minY=${minY}&maxX=${maxX}&maxY=${maxY}&zoom=${zoom}`);
     const data = await resp.json();
 
     if (data.results.length < 1) {
