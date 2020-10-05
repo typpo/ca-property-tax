@@ -61,10 +61,12 @@ class GeoIndex {
     }
 
     const nearest = this.index.range(minX, minY, maxX, maxY).map(idx => this.points[idx]);
+    /*
     if (zoom >= 18) {
       // Return all
       return nearest.slice(0, MAX_NUM_RESULTS);
     }
+    */
     return getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
   }
 }
