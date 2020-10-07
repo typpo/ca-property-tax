@@ -254,7 +254,7 @@
         const abbreviated = ((Math.round(record.tax / 100.0) * 100.0) / 1000.0).toLocaleString();
 
         let taxUrl;
-        switch(record.county) {
+        switch(record.county.trim()) {
           case 'SM':
             taxUrl = `https://sanmateo-ca.county-taxes.com/public/search?search_query=${record.apn}&category=all`;
             break;
@@ -272,7 +272,7 @@
             &middot;
             <a target="_blank" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${record.lat},${record.lng}">Street view</a>
             &middot;
-            <a target="_blank" href="https://www.google.com/search?q=${encodeURIComponent(record.address)}+San+Mateo+CA+%28site%3Azillow.com+OR+site%3Aredfin.com%29">Real estate</a>
+            <a target="_blank" href="https://www.google.com/search?q=${encodeURIComponent(record.address)}+%28site%3Azillow.com+OR+site%3Aredfin.com%29">Real estate</a>
           </center>
         `;
         marker.bindPopup(popupContent);
