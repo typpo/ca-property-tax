@@ -1,68 +1,97 @@
- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-   crossorigin=""/>
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css" integrity="sha512-RLEjtaFGdC4iQMJDbMzim/dOvAu+8Qp9sw7QE4wIMYcg2goVoivzwgSZq9CsIxp4xKAZPKh5J2f2lOko2Ze6FQ==" crossorigin="anonymous" />
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" integrity="sha512-BBToHPBStgMiw0lD4AtkRIZmdndhB6aQbXpX7omcrXeG2PauGBl2lzq2xUZTxaLxYz5IDHlmneCZ1IJ+P3kYtQ==" crossorigin="anonymous" />
-<style>
-body {
-  margin: 0;
-}
-#map { height: 100%; width: 100%; }
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bay Area property tax map</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-.maplabel {
-  font-size: 14px;
-  padding: 0px 6px;
-  color: #fff;
-  background-color: #404040;
-  border-color: #404040;
-  font-weight: bold;
-  border-radius: 10px;
-}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css" integrity="sha512-RLEjtaFGdC4iQMJDbMzim/dOvAu+8Qp9sw7QE4wIMYcg2goVoivzwgSZq9CsIxp4xKAZPKh5J2f2lOko2Ze6FQ==" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" integrity="sha512-BBToHPBStgMiw0lD4AtkRIZmdndhB6aQbXpX7omcrXeG2PauGBl2lzq2xUZTxaLxYz5IDHlmneCZ1IJ+P3kYtQ==" crossorigin="anonymous" />
+  <style>
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100vh;
+    }
 
-.tax-high {
-  color: #fff;
-  background-color: #f34336;
-  border-color: #f34336;
-  font-weight: bold;
-}
+    #map { height: 100%; width: 100%; }
 
-.tax-low {
-  color: #fff;
-  background-color: #4caf4f;
-  border-color: #4caf4f;
-  font-weight: bold;
-}
+    .autocomplete-container {
+      position: absolute;
+      top: 1em;
+      left: 4em;
+      width: 15em;
+      height: 2em;
+      z-index: 999;
+    }
 
-.marker-cluster div {
-  background-color: #ffdd78;
-    padding: 4px;
-}
+    #autocomplete {
+      width: 100%;
+      padding: 0.25em;
+    }
 
-.marker-cluster span {
-  font-size: 14px;
-  font-weight: bold;
-  margin-left: -0.5em;
-  white-space: nowrap;
+    .maplabel {
+      font-size: 14px;
+      padding: 0px 6px;
+      color: #fff;
+      background-color: #404040;
+      border-color: #404040;
+      font-weight: bold;
+      border-radius: 10px;
+    }
 
-  /*
-  font-size: 14px;
-    font-weight: bold;
-    margin-left: -0.5em;
-    white-space: nowrap;
-    background-color: #909090;
-    color: #fff;
-    padding: 3px 7px;
-    border-radius: 8px;
-      */
-}
-</style>
+    .tax-high {
+      color: #fff;
+      background-color: #f34336;
+      border-color: #f34336;
+      font-weight: bold;
+    }
+
+    .tax-low {
+      color: #fff;
+      background-color: #4caf4f;
+      border-color: #4caf4f;
+      font-weight: bold;
+    }
+
+    .marker-cluster div {
+      background-color: #ffdd78;
+        padding: 4px;
+    }
+
+    .marker-cluster span {
+      font-size: 14px;
+      font-weight: bold;
+      margin-left: -0.5em;
+      white-space: nowrap;
+
+      /*
+      font-size: 14px;
+        font-weight: bold;
+        margin-left: -0.5em;
+        white-space: nowrap;
+        background-color: #909090;
+        color: #fff;
+        padding: 3px 7px;
+        border-radius: 8px;
+          */
+    }
+  </style>
+</head>
+<body>
 
 <div id="map"></div>
+<div class="autocomplete-container">
+  <input id="autocomplete" type="text" />
+</div>
 
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
    crossorigin=""></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js" integrity="sha512-MQlyPV+ol2lp4KodaU/Xmrn+txc1TP15pOBF/2Sfre7MRsA/pB4Vy58bEqe9u7a7DczMLtU5wT8n7OblJepKbg==" crossorigin="anonymous"></script>
+<script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVWwnb8PxtFjqLXATjEtIozN-ZDBMMIng&libraries=places&callback=setupAutoComplete">
+</script>
 <script>
   class LRU {
     constructor(max = 10) {
@@ -91,6 +120,33 @@ body {
     first() {
         return this.cache.keys().next().value;
     }
+  }
+
+  function setupAutoComplete() {
+    const defaultBounds = new google.maps.LatLngBounds(
+      new google.maps.LatLng(38.502719,-121.5352957),
+      new google.maps.LatLng(37.108217,-122.5606637));
+
+    const input = document.getElementById('autocomplete');
+    const options = {
+      bounds: defaultBounds,
+    };
+
+    const autocomplete = new google.maps.places.Autocomplete(input, options);
+
+    google.maps.event.addListener(autocomplete, 'place_changed', function() {
+      const place = autocomplete.getPlace();
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+      map.flyTo([lat, lng], Math.max(map.getZoom(), 17));
+
+      const placeMarker = L.marker([lat, lng],{
+        zIndexOffset: 999,
+      }).addTo(map);
+      placeMarker.on('click', function() {
+        map.removeLayer(placeMarker);
+      });
+    });
   }
 
   let markers = undefined;
@@ -276,3 +332,6 @@ body {
 
   loadMarkers();
 </script>
+
+</body>
+</html>
