@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 with open('/home/ian/Downloads/san_mateo_apn/san_mateo.geojson') as f_in, \
      open('./parse_output.csv', 'w') as f_out:
-    fieldnames = ['address', 'apn', 'longitude', 'latitude', 'tax']
+    fieldnames = ['address', 'apn', 'longitude', 'latitude', 'tax', 'county']
     writer = csv.DictWriter(f_out, fieldnames=fieldnames)
     count = 0
     for line in f_in:
@@ -73,5 +73,6 @@ with open('/home/ian/Downloads/san_mateo_apn/san_mateo.geojson') as f_in, \
             'latitude': centroid[1],
             'longitude': centroid[0],
             'tax': amount * 2,
+            'county': 'SF',
         })
         f_out.flush()

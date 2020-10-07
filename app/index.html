@@ -171,8 +171,8 @@ body {
     */
 
     const records = data.results.map(result => {
-      const [address, apn, tax, lat, lng] = result;
-      return { address, apn, tax, lat, lng, };
+      const [address, apn, tax, county, lat, lng] = result;
+      return { address, apn, tax, county, lat, lng, };
     });
 
     const taxes = [];
@@ -197,18 +197,27 @@ body {
 
         const abbreviated = ((Math.round(record.tax / 100.0) * 100.0) / 1000.0).toLocaleString();
 
+        let taxUrl;
+        switch(record.county) {
+          case 'SM':
+            taxUrl = `https://sanmateo-ca.county-taxes.com/public/search?search_query=${record.apn}&category=all`;
+            break;
+          case 'SC':
+            taxUrl = 'https://payments.sccgov.org/propertytax/Secured';
+            break;
+        }
         const popupContent = `
           <center>
             <h2>${record.address}</h2>
             Yearly tax assessment: <strong>$${Math.round(record.tax).toLocaleString()}</strong>
+            <br>
+            <br>
+            <a target="_blank" href="${taxUrl}">Tax records</a>
+            &middot;
+            <a target="_blank" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${record.lat},${record.lng}">Street view</a>
+            &middot;
+            <a target="_blank" href="https://www.google.com/search?q=${encodeURIComponent(record.address)}+San+Mateo+CA+%28site%3Azillow.com+OR+site%3Aredfin.com%29">Real estate</a>
           </center>
-          <br>
-          <br>
-          <a target="_blank" href="https://sanmateo-ca.county-taxes.com/public/search?search_query=${record.apn}&category=all">Tax records</a>
-          &middot;
-          <a target="_blank" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${record.lat},${record.lng}">Street view</a>
-          &middot;
-          <a target="_blank" href="https://www.google.com/search?q=${encodeURIComponent(record.address)}+San+Mateo+CA+%28site%3Azillow.com+OR+site%3Aredfin.com%29">Real estate</a>
         `;
         marker.bindPopup(popupContent);
         let taxclass = '';

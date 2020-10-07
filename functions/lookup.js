@@ -33,11 +33,11 @@ class GeoIndex {
     const parser = stream.pipe(csvParse());
     const points = [];
     for await (const record of parser) {
-      const [address, apn, lng, lat, tax] = record;
+      const [address, apn, lng, lat, tax, county] = record;
       if (tax <= 0 || !address || address === 'UNKNOWN') {
         continue;
       }
-      points.push({ address, apn, tax: parseFloat(tax), lat: parseFloat(lat), lng: parseFloat(lng) });
+      points.push({ address, apn, county, tax: parseFloat(tax), lat: parseFloat(lat), lng: parseFloat(lng) });
     }
 
     this.index = new KdBush(points, p => p.lng, p => p.lat);

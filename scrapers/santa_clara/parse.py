@@ -19,7 +19,7 @@ with open('/home/ian/Downloads/Santa_Clara_Parcels.csv') as f_in, \
      open('./parse_output.csv', 'w') as f_out:
     reader = csv.DictReader(f_in)
 
-    fieldnames = ['address', 'apn', 'longitude', 'latitude', 'tax']
+    fieldnames = ['address', 'apn', 'longitude', 'latitude', 'tax', 'county']
     writer = csv.DictWriter(f_out, fieldnames=fieldnames)
     count = 0
     for record in reader:
@@ -78,4 +78,5 @@ with open('/home/ian/Downloads/Santa_Clara_Parcels.csv') as f_in, \
             'latitude': centroid[1],
             'longitude': centroid[0],
             'tax': amount * 2,
+            'county': 'SC',
         })

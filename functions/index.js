@@ -31,7 +31,7 @@ app.get('/lookup', async (req, res) => {
   }
   res.json({
     results: ret.map(loc => {
-      return [loc.address, loc.apn, loc.tax, loc.lat, loc.lng];
+      return [loc.address, loc.apn, loc.tax, loc.county, loc.lat, loc.lng];
     }),
   });
 });
