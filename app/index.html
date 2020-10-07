@@ -192,7 +192,8 @@
 
       const minTaxStr = Math.round(minTax / 1000).toLocaleString();
       const maxTaxStr = Math.round(maxTax / 1000).toLocaleString();
-      return new L.DivIcon({ html: `<div><span>$${minTaxStr}-${maxTaxStr}k</span></div>`, className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+      const priceStr = minTaxStr === maxTaxStr ? `~${minTaxStr}k` : `${minTaxStr}-${maxTaxStr}k`;
+      return new L.DivIcon({ html: `<div><span>${priceStr}</span></div>`, className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
     }
   });
   markerGroups._getExpandedVisibleBounds = function () {
