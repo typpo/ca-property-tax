@@ -19,7 +19,7 @@ with open('/home/ian/Downloads/Santa_Clara_Parcels.csv') as f_in, \
      open('./parse_output.csv', 'w') as f_out:
     reader = csv.DictReader(f_in)
 
-    fieldnames = ['address', 'apn', 'longitude', 'latitude', 'tax', 'zone']
+    fieldnames = ['address', 'apn', 'longitude', 'latitude', 'tax']
     writer = csv.DictWriter(f_out, fieldnames=fieldnames)
     count = 0
     for record in reader:
@@ -31,7 +31,11 @@ with open('/home/ian/Downloads/Santa_Clara_Parcels.csv') as f_in, \
         lnglats = []
         geom_str = record['the_geom'].replace('MULTIPOLYGON (((', '').replace(')))', '')
         geom_splits = map(lambda lnglatstr: lnglatstr.strip().split(' '), geom_str.replace('(', '').replace(')', '').split(','))
-        coords = [(float(x[0]), float(x[1])) for x in geom_splits]
+        try:
+            coords = [(float(x[0]), float(x[1])) for x in geom_splits]
+        except ValueError:
+            print('--> bad coords', geom_splits)
+            continue
 
         try:
             centroid = list(Polygon(coords).centroid.coords)[0]
@@ -45,8 +49,12 @@ with open('/home/ian/Downloads/Santa_Clara_Parcels.csv') as f_in, \
             print('-->', apn, 'record does not exist')
             continue
 
-        with gzip.open(output_path, 'rt') as f_in:
-            html = f_in.read()
+        try:
+            with gzip.open(output_path, 'rt') as f_in:
+                html = f_in.read()
+        except:
+            print('--> bad file')
+            continue
 
         try:
             address = ADDRESS_REGEX.search(html).group(1) + ''

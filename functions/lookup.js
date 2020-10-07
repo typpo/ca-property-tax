@@ -28,7 +28,7 @@ class GeoIndex {
   }
 
   async load() {
-    const stream = fs.createReadStream(__dirname + '/../data/san_mateo_partial2.csv');
+    const stream = fs.createReadStream(__dirname + '/../data/bay_area_all.csv');
 
     const parser = stream.pipe(csvParse());
     const points = [];

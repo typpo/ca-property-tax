@@ -34,8 +34,12 @@ with open('/home/ian/Downloads/san_mateo_apn/san_mateo.geojson') as f_in, \
             print(apn, 'record does not exist')
             break
 
-        with gzip.open(output_path, 'rt') as f_in:
-            html = f_in.read()
+        try:
+            with gzip.open(output_path, 'rt') as f_in:
+                html = f_in.read()
+        except:
+            print('--> bad file')
+            continue
 
         soup = BeautifulSoup(html, 'html.parser')
         owner = soup.find('span', class_='gsgx-account-owner')
@@ -59,6 +63,8 @@ with open('/home/ian/Downloads/san_mateo_apn/san_mateo.geojson') as f_in, \
                     break
                 except:
                     print('--> Could not parse float', amount_str)
+        if amount < 0:
+            continue
         print('--> Paid', amount)
 
         writer.writerow({
