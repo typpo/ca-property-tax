@@ -7,7 +7,7 @@ import os
 import requests
 from shapely.geometry import Polygon
 
-with open('/home/ian/Downloads/san_mateo_apn/san_mateo.geojson') as f_in:
+with open('../../addresses/san_mateo.geojson') as f_in:
     count = 0
     for line in f_in:
         count += 1

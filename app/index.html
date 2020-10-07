@@ -208,7 +208,7 @@ body {
           &middot;
           <a target="_blank" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${record.lat},${record.lng}">Street view</a>
           &middot;
-          <a target="_blank" href="https://www.google.com/search?q=${encodeURIComponent(record.address)}+San+Mateo+CA+site%3Azillow.com">Real estate</a>
+          <a target="_blank" href="https://www.google.com/search?q=${encodeURIComponent(record.address)}+San+Mateo+CA+%28site%3Azillow.com+OR+site%3Aredfin.com%29">Real estate</a>
         `;
         marker.bindPopup(popupContent);
         let taxclass = '';
