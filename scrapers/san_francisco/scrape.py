@@ -4,6 +4,7 @@ import csv
 import gzip
 import json
 import os
+import time
 import sys
 
 import requests
@@ -35,4 +36,6 @@ with open('/home/ian/Downloads/Parcels___Active_and_Retired.csv') as f_in:
             with gzip.open(output_path, 'wt') as f_out:
                 f_out.write(html)
         else:
-            print('-> Failed')
+            print('-> Failed with code', resp.status_code)
+
+        time.sleep(0.5)
