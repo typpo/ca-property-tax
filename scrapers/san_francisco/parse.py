@@ -9,27 +9,22 @@ import os
 from shapely.geometry import Polygon
 from bs4 import BeautifulSoup
 
-with open('/home/ian/Downloads/san_mateo_apn/san_mateo.geojson') as f_in, \
+with open('/home/ian/Downloads/Parcels___Active_and_Retired.csv') as f_in, \
      open('./parse_output.csv', 'w') as f_out:
-    fieldnames = ['address', 'apn', 'longitude', 'latitude', 'tax', 'county']
-    writer = csv.DictWriter(f_out, fieldnames=fieldnames)
     count = 0
-    for line in f_in:
+    reader = csv.DictReader(f_in)
+    for record in reader:
         count += 1
-        if count < 6:
-            continue
-        record = json.loads(line[:-2])
-        apn = record['properties']['APN']
 
-        coords = record['geometry']['coordinates'][0]
-        try:
-            centroid = list(Polygon(coords).centroid.coords)[0]
-        except:
-            continue
+        apn = record['blklot']
+
+        #coords = record['geometry']['coordinates'][0]
+        #centroid = list(Polygon(coords).centroid.coords)[0]
+        centroid = ()
 
         print(count, apn, centroid)
 
-        output_path = '/home/ian/code/prop13/scrapers/san_mateo/scrape_output/%s.html' % (apn)
+        output_path = '/home/ian/code/prop13/scrapers/san_francisco/scrape_output/%s.html' % (apn)
         if not os.path.exists(output_path):
             print(apn, 'record does not exist')
             break
@@ -75,4 +70,3 @@ with open('/home/ian/Downloads/san_mateo_apn/san_mateo.geojson') as f_in, \
             'tax': amount * 2,
             'county': 'SF',
         })
-        f_out.flush()
