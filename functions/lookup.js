@@ -4,7 +4,7 @@ const csvParse = require('csv-parse');
 const geokdbush = require('geokdbush');
 const KdBush = require('kdbush');
 
-const MAX_NUM_RESULTS = 200;
+const MAX_NUM_RESULTS = 250;
 
 const MAX_RADIUS_KM = 5;
 
