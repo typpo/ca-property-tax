@@ -243,16 +243,30 @@
 
     markers = [];
     records.forEach(record => {
+      const abbreviated = ((Math.round(record.tax / 100.0) * 100.0) / 1000.0).toLocaleString();
+
+      let taxclass = '';
+      if (record.tax >= topPercentile) {
+        taxclass = 'high';
+      } else if (record.tax <= bottomPercentile) {
+        taxclass = 'low';
+      }
+
       let marker = apnToMarkerCache.get(record.apn);
       if (marker) {
         // Tooltip is going to get updated
         //marker.unbindTooltip();
+        if (marker._tooltip._contentNode) {
+          marker._tooltip._contentNode.classList.remove('tax-low');
+          marker._tooltip._contentNode.classList.remove('tax-high');
+          if (taxclass) {
+            marker._tooltip._contentNode.classList.add(`tax-${taxclass}`);
+          }
+        }
       } else {
         marker = new L.marker([record.lat, record.lng], { opacity: 0.01 });
         marker.record = record;
         apnToMarkerCache.set(record.apn, marker);
-
-        const abbreviated = ((Math.round(record.tax / 100.0) * 100.0) / 1000.0).toLocaleString();
 
         let taxUrl;
         switch(record.county.trim()) {
@@ -277,12 +291,6 @@
           </center>
         `;
         marker.bindPopup(popupContent);
-        let taxclass = '';
-        if (record.tax >= topPercentile) {
-          taxclass = 'high';
-        } else if (record.tax <= bottomPercentile) {
-          taxclass = 'low';
-        }
 
         marker.bindTooltip(`${abbreviated}k`, {
           permanent: true,
@@ -317,7 +325,9 @@
     }
   }
 
-  const map = L.map('map').setView([initialLat, initialLng], initialZoom);
+  const map = L.map('map', {
+    preferCanvas: true,
+  }).setView([initialLat, initialLng], initialZoom);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}.png', {
 	maxZoom: 19,
 }).addTo(map);
