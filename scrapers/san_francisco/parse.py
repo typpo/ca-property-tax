@@ -5,6 +5,7 @@ import csv
 import gzip
 import json
 import os
+import sys
 
 from shapely.geometry import Polygon
 from bs4 import BeautifulSoup
