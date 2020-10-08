@@ -157,6 +157,9 @@
   const markerGroups = L.markerClusterGroup({
     //disableClusteringAtZoom: 19,
     maxClusterRadius: (zoom) => {
+      if (zoom >= 20) {
+        return 10;
+      }
       if (zoom >= 18) {
         return 20;
       }
@@ -325,12 +328,22 @@
     }
   }
 
+  const normal = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}.png', {
+    maxZoom: 20,
+  });
+  const satellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+  });
+
   const map = L.map('map', {
     preferCanvas: true,
+    layers: [normal],
   }).setView([initialLat, initialLng], initialZoom);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}.png', {
-	maxZoom: 19,
-}).addTo(map);
+
+  L.control.layers({
+    'Basic': normal,
+    'Satellite': satellite,
+  }, {}).addTo(map);
 
   let lastZoom;
   let lastXY;
