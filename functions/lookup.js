@@ -8,6 +8,9 @@ const MAX_NUM_RESULTS = 200;
 
 const MAX_RADIUS_KM = 5;
 
+const NUM_GRIDS = 8;
+const GRID_NUM_DECIMALS_ROUNDED = 3;
+
 function getRandom(arr, n) {
   var result = new Array(n),
     len = arr.length,
@@ -20,6 +23,11 @@ function getRandom(arr, n) {
     taken[x] = --len in taken ? taken[len] : len;
   }
   return result;
+}
+
+function round(value, precision = GRID_NUM_DECIMALS_ROUNDED) {
+  const multiplier = Math.pow(10, precision || 0);
+  return Math.round(value * multiplier) / multiplier;
 }
 
 class GeoIndex {
@@ -67,7 +75,48 @@ class GeoIndex {
       return nearest.slice(0, MAX_NUM_RESULTS);
     }
     */
-    return getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
+    if (nearest.length <= MAX_NUM_RESULTS) {
+      return nearest;
+    }
+
+    minX = round(minX);
+    minY = round(minY);
+    maxX = round(maxX);
+    maxY = round(maxY);
+
+    const gridX = round((maxX - minX) / NUM_GRIDS);
+    const gridY = round((maxY - minY) / NUM_GRIDS);
+
+    const ret = [];
+    for (let x1 = minX; x1 < maxX; x1 += gridX) {
+      for (let y1 = minY; y1 < maxY; y1 += gridY) {
+        const x1Min = round(x1);
+        const y1Min = round(y1);
+        const x1Max = round(x1 + gridX);
+        const y1Max = round(y1 + gridY);
+        const gridContents = this.index.range(
+          x1Min, y1Min, x1Max, y1Max,
+        ).map(idx => this.points[idx]);
+        if (gridContents.length < 1) {
+          continue;
+        }
+        let maxResult = gridContents[0];
+        let minResult = gridContents[0];
+        gridContents.forEach(record => {
+          if (record.tax > maxResult.tax) {
+            maxResult = record;
+          }
+          if (record.tax < minResult.tax) {
+            minResult = record;
+          }
+        });
+        ret.push(maxResult);
+        if (maxResult !== minResult) {
+          ret.push(minResult);
+        }
+      }
+    }
+    return ret;
   }
 }
 
