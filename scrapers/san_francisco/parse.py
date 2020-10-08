@@ -57,9 +57,9 @@ with open('/home/ian/Downloads/Parcels___Active_and_Retired.csv') as f_in, \
             continue
         ownersplit = owner.get_text().split(' at ')
         if len(ownersplit) < 2:
-            address = 'UNKNOWN'
+            continue
         else:
-            address = ownersplit[1].strip()
+            address = ownersplit[1].strip().replace('\n', ' ')
             print('address:', address)
 
         amount = -1
