@@ -323,11 +323,27 @@
 	maxZoom: 19,
 }).addTo(map);
 
-  map.on('moveend', function() {
+  let lastZoom;
+  let lastXY;
+  map.on('moveend', function(e) {
     const zoom = map.getZoom();
     const center = map.getCenter();
+
+    const layerPoint = map.latLngToLayerPoint(center);
+    const newXY = [layerPoint.x, layerPoint.y];
+
+    if (lastXY) {
+      const pixelsChanged = Math.sqrt(Math.pow(lastXY[0] - newXY[0], 2) + Math.pow(lastXY[1] - newXY[1], 2));
+      if (zoom === lastZoom && pixelsChanged < 200) {
+        return;
+      }
+    }
+
     window.location.replace(`#${center.lat},${center.lng},${zoom}`);
     loadMarkers();
+
+    lastZoom = zoom;
+    lastXY = newXY;
   });
   map.addLayer(markerGroups);
 
