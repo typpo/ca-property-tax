@@ -9,18 +9,32 @@ import os
 from shapely.geometry import Polygon
 from bs4 import BeautifulSoup
 
+csv.field_size_limit(sys.maxsize)
+
 with open('/home/ian/Downloads/Parcels___Active_and_Retired.csv') as f_in, \
      open('./parse_output.csv', 'w') as f_out:
-    count = 0
     reader = csv.DictReader(f_in)
+    fieldnames = ['address', 'apn', 'longitude', 'latitude', 'tax', 'county']
+    writer = csv.DictWriter(f_out, fieldnames=fieldnames)
+
+    count = 0
     for record in reader:
         count += 1
 
         apn = record['blklot']
 
-        #coords = record['geometry']['coordinates'][0]
-        #centroid = list(Polygon(coords).centroid.coords)[0]
-        centroid = ()
+        geom_str = record['shape'].replace('MULTIPOLYGON (((', '').replace(')))', '')
+        geom_splits = map(lambda lnglatstr: lnglatstr.strip().split(' '), geom_str.replace('(', '').replace(')', '').split(','))
+        try:
+            coords = [(float(x[0]), float(x[1])) for x in geom_splits]
+        except ValueError:
+            print('--> bad coords', geom_splits)
+            continue
+
+        try:
+            centroid = list(Polygon(coords).centroid.coords)[0]
+        except:
+            continue
 
         print(count, apn, centroid)
 
