@@ -4,7 +4,7 @@ const csvParse = require('csv-parse');
 const geokdbush = require('geokdbush');
 const KdBush = require('kdbush');
 
-const MAX_NUM_RESULTS = 200;
+const MAX_NUM_RESULTS = 250;
 
 const MAX_RADIUS_KM = 5;
 
@@ -52,14 +52,16 @@ class GeoIndex {
     this.points = points;
   }
 
-  async getNearby(lat, lng) {
+  async getNearby(lat, lng, minX, minY, maxX, maxY) {
     if (!this.index) {
       console.log('Lazily initializing geo index...');
       await idx.load();
     }
 
-    const nearest = geokdbush.around(this.index, lng, lat, MAX_NUM_RESULTS, MAX_RADIUS_KM);
-    return nearest;
+    const nearest = geokdbush.around(this.index, lng, lat, MAX_NUM_RESULTS * 4, MAX_RADIUS_KM);
+    return nearest.filter(record => {
+      return minY <= record.lat && record.lat <= maxY && minX <= record.lng && record.lng <= maxX;
+    }).slice(0, MAX_NUM_RESULTS);
   }
 
   async getWithinBounds(minX, minY, maxX, maxY, zoom) {

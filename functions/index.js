@@ -25,7 +25,7 @@ app.get('/lookup', async (req, res) => {
 
   let ret;
   if (zoom >= 18) {
-    ret = await GeoIndex.getNearby(lat, lng);
+    ret = await GeoIndex.getNearby(lat, lng, minX, minY, maxX, maxY);
   } else {
     ret = await GeoIndex.getWithinBounds(minX, minY, maxX, maxY, zoom);
   }
