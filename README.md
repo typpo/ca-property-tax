@@ -13,3 +13,7 @@ Crawl/scrape/parse code lives in the `scrapers/` directory.  Each county has `sc
 ## Serving
 
 A simple node app hosts the map and a `/lookup` endpoint.  On start it loads all parse outputs in a geospatial index.  Install node dependencies with `yarn install` and then run the app in `server/index.js`.
+
+## TODO
+
+- Add support for more counties
