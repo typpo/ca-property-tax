@@ -274,6 +274,7 @@
 
         let taxUrl;
         let countyStr;
+        let disclaimer = '';
         switch(record.county.trim()) {
           case 'SM':
             taxUrl = `https://sanmateo-ca.county-taxes.com/public/search?search_query=${record.apn}&category=all`;
@@ -287,12 +288,17 @@
             taxUrl = `https://sanfrancisco-ca.county-taxes.com/public/search?search_query=${record.apn}&category=gsgx_property_tax`;
             countyStr = 'San Francisco';
             break;
+          case 'LA':
+            taxUrl = 'https://vcheck.ttc.lacounty.gov/index.php';
+            countyStr = 'Los Angeles';
+            disclaimer = `est. based on <a href="https://www.latimes.com/local/la-me-city-property-tax-table-htmlstory.html">1.16%</a> average property tax rate. AIN ${record.apn}`;
+            break;
         }
         const realEstateQuery = `${record.address}, ${countyStr} CA (site:zillow.com OR site:redfin.com)`;
         const popupContent = `
           <center>
             <h2>${record.address}</h2>
-            Yearly tax assessment: <strong>$${Math.round(record.tax).toLocaleString()}</strong>
+            Yearly tax assessment: <strong>$${Math.round(record.tax).toLocaleString()}</strong> ${disclaimer}
             <br>
             <br>
             <a target="_blank" href="${taxUrl}">Tax records</a>
