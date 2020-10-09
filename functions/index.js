@@ -16,9 +16,10 @@ app.get('/lookup', async (req, res) => {
   const maxX = parseFloat(req.query.maxX);
   const maxY = parseFloat(req.query.maxY);
 
-  if (isNaN(lat) || isNaN(lng)) {
+  if (isNaN(lat) || isNaN(lng) || isNaN(zoom) || isNaN(minX) || isNaN(minY) || isNaN(maxX) || isNaN(maxY)) {
     res.status(500).json({
       error: 'Invalid latlng',
+      results: [],
     });
     return;
   }

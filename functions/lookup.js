@@ -80,23 +80,24 @@ class GeoIndex {
 
     const nearest = this.index.range(minX, minY, maxX, maxY).map(idx => this.points[idx]);
 
-    return getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
-    /*
+    //return getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
     if (nearest.length <= MAX_NUM_RESULTS) {
       return nearest;
     }
 
-    minX = round(minX);
-    minY = round(minY);
-    maxX = round(maxX);
-    maxY = round(maxY);
+    minX = Math.max(-140, round(minX));
+    minY = Math.max(25, round(minY));
+    maxX = Math.min(-110, round(maxX));
+    maxY = Math.min(40, round(maxY));
 
     const gridX = round((maxX - minX) / NUM_GRIDS);
     const gridY = round((maxY - minY) / NUM_GRIDS);
 
     const ret = [];
-    for (let x1 = minX; x1 < maxX; x1 += gridX) {
-      for (let y1 = minY; y1 < maxY; y1 += gridY) {
+    let count = 0;
+    for (let x1 = minX; x1 < maxX; x1 += gridX || count > 1e6) {
+      for (let y1 = minY; y1 < maxY; y1 += gridY || count > 1e6) {
+        count++;
         const x1Min = round(x1);
         const y1Min = round(y1);
         const x1Max = round(x1 + gridX);
@@ -124,7 +125,6 @@ class GeoIndex {
       }
     }
     return ret;
-    */
   }
 }
 
