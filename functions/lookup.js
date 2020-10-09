@@ -1,4 +1,5 @@
 const fs = require('fs');
+const zlib = require('zlib');
 
 const csvParse = require('csv-parse');
 const geokdbush = require('geokdbush');
@@ -37,9 +38,10 @@ class GeoIndex {
 
   async load() {
     console.log('Loading index...');
-    const stream = fs.createReadStream(__dirname + '/../data/bay_area_all.csv');
+    const gunzip = zlib.createGunzip();
+    const stream = fs.createReadStream(__dirname + '/../data/bay_area_all.csv.gz');
 
-    const parser = stream.pipe(csvParse());
+    const parser = stream.pipe(gunzip).pipe(csvParse());
     const points = [];
     for await (const record of parser) {
       const [address, apn, lng, lat, tax, county] = record;
@@ -76,13 +78,10 @@ class GeoIndex {
       return [];
     }
 
-    const nearest = this.index.range(minX, minY, maxX, maxY).slice(0, 10000).map(idx => this.points[idx]);
+    const nearest = this.index.range(minX, minY, maxX, maxY).map(idx => this.points[idx]);
+
+    return getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
     /*
-    if (zoom >= 18) {
-      // Return all
-      return nearest.slice(0, MAX_NUM_RESULTS);
-    }
-    */
     if (nearest.length <= MAX_NUM_RESULTS) {
       return nearest;
     }
@@ -125,6 +124,7 @@ class GeoIndex {
       }
     }
     return ret;
+    */
   }
 }
 
