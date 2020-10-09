@@ -1,13 +1,6 @@
-const express = require('express');
-const cors = require('cors');
-
 const { GeoIndex } = require('./lookup');
 
-const app = express();
-app.use(cors());
-app.use(express.static(__dirname + '/../app'));
-
-app.get('/lookup', async (req, res) => {
+async function caPropertyLookup(req, res) {
   const lat = parseFloat(req.query.lat);
   const lng = parseFloat(req.query.lng);
   const zoom = parseInt(req.query.zoom, 10);
@@ -35,8 +28,8 @@ app.get('/lookup', async (req, res) => {
       return [loc.address, loc.apn, loc.tax, loc.county, loc.lat, loc.lng];
     }),
   });
-});
+}
 
-app.listen(process.env.PORT || 13000, '0.0.0.0', () => {
-  console.log('App listening...');
-});
+module.exports = {
+  caPropertyLookup,
+};
