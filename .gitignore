@@ -2,7 +2,7 @@
 *.csv.gz
 *.geojson
 *.geojson.gz
-scrapers/san_mateo/scrape_output/*.html
+scrapers/*/scrape_output/*.html
 venv
 
 ### Vim ###

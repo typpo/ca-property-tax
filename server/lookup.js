@@ -13,13 +13,13 @@ const NUM_GRIDS = 8;
 const GRID_NUM_DECIMALS_ROUNDED = 3;
 
 function getRandom(arr, n) {
-  var result = new Array(n),
-    len = arr.length,
-    taken = new Array(len);
+  const result = new Array(n);
+  const len = arr.length;
+  const taken = new Array(len);
   if (n > len)
-    throw new RangeError("getRandom: more elements taken than available");
+    throw new RangeError('getRandom: more elements taken than available');
   while (n--) {
-    var x = Math.floor(Math.random() * len);
+    const x = Math.floor(Math.random() * len);
     result[n] = arr[x in taken ? taken[x] : x];
     taken[x] = --len in taken ? taken[len] : len;
   }
@@ -85,6 +85,7 @@ class GeoIndex {
       return nearest;
     }
 
+    // Sanity check bounds
     minX = Math.max(-140, round(minX));
     minY = Math.max(25, round(minY));
     maxX = Math.min(-110, round(maxX));
@@ -95,8 +96,8 @@ class GeoIndex {
 
     const ret = [];
     let count = 0;
-    for (let x1 = minX; x1 < maxX; x1 += gridX || count > 1e6) {
-      for (let y1 = minY; y1 < maxY; y1 += gridY || count > 1e6) {
+    for (let x1 = minX; x1 < maxX; x1 += gridX || count > 1e5) {
+      for (let y1 = minY; y1 < maxY; y1 += gridY || count > 1e5) {
         count++;
         const x1Min = round(x1);
         const y1Min = round(y1);
