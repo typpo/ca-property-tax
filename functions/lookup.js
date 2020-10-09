@@ -36,6 +36,7 @@ class GeoIndex {
   }
 
   async load() {
+    console.log('Loading index...');
     const stream = fs.createReadStream(__dirname + '/../data/bay_area_all.csv');
 
     const parser = stream.pipe(csvParse());
@@ -50,12 +51,13 @@ class GeoIndex {
 
     this.index = new KdBush(points, p => p.lng, p => p.lat);
     this.points = points;
+    console.log('Loaded index');
   }
 
   async getNearby(lat, lng, minX, minY, maxX, maxY) {
     if (!this.index) {
-      console.log('Lazily initializing geo index...');
-      await idx.load();
+      console.warn('Geo index not yet loaded');
+      return [];
     }
 
     const nearest = geokdbush.around(this.index, lng, lat, MAX_NUM_RESULTS * 4, MAX_RADIUS_KM);
@@ -66,8 +68,8 @@ class GeoIndex {
 
   async getWithinBounds(minX, minY, maxX, maxY, zoom) {
     if (!this.index) {
-      console.log('Lazily initializing geo index...');
-      await idx.load();
+      console.warn('Geo index not yet loaded');
+      return [];
     }
 
     const nearest = this.index.range(minX, minY, maxX, maxY).map(idx => this.points[idx]);
@@ -123,6 +125,7 @@ class GeoIndex {
 }
 
 const idx = new GeoIndex();
+idx.load();
 
 module.exports = {
   GeoIndex: idx,
