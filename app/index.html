@@ -273,14 +273,22 @@
         apnToMarkerCache.set(record.apn, marker);
 
         let taxUrl;
+        let countyStr;
         switch(record.county.trim()) {
           case 'SM':
             taxUrl = `https://sanmateo-ca.county-taxes.com/public/search?search_query=${record.apn}&category=all`;
+            countyStr = 'San Mateo';
             break;
           case 'SC':
             taxUrl = 'https://payments.sccgov.org/propertytax/Secured';
+            countyStr = 'Santa Clara';
+            break;
+          case 'SF':
+            taxUrl = `https://sanfrancisco-ca.county-taxes.com/public/search?search_query=${record.apn}&category=gsgx_property_tax`;
+            countyStr = 'San Francisco';
             break;
         }
+        const realEstateQuery = `${record.address}, ${countyStr} CA (site:zillow.com OR site:redfin.com)`;
         const popupContent = `
           <center>
             <h2>${record.address}</h2>
@@ -291,7 +299,7 @@
             &middot;
             <a target="_blank" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${record.lat},${record.lng}">Street view</a>
             &middot;
-            <a target="_blank" href="https://www.google.com/search?q=${encodeURIComponent(record.address)}+%28site%3Azillow.com+OR+site%3Aredfin.com%29">Real estate</a>
+            <a target="_blank" href="https://www.google.com/search?q=${encodeURIComponent(realEstateQuery)}">Real estate</a>
           </center>
         `;
         marker.bindPopup(popupContent);
