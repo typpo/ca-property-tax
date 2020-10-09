@@ -67,12 +67,16 @@ class GeoIndex {
   }
 
   async getWithinBounds(minX, minY, maxX, maxY, zoom) {
+    if (minX >= maxX || minY >= maxY) {
+      console.log('Invalid bounds');
+      return [];
+    }
     if (!this.index) {
       console.warn('Geo index not yet loaded');
       return [];
     }
 
-    const nearest = this.index.range(minX, minY, maxX, maxY).map(idx => this.points[idx]);
+    const nearest = this.index.range(minX, minY, maxX, maxY).slice(0, 10000).map(idx => this.points[idx]);
     /*
     if (zoom >= 18) {
       // Return all
@@ -100,7 +104,7 @@ class GeoIndex {
         const y1Max = round(y1 + gridY);
         const gridContents = this.index.range(
           x1Min, y1Min, x1Max, y1Max,
-        ).map(idx => this.points[idx]);
+        ).slice(0, 10000).map(idx => this.points[idx]);
         if (gridContents.length < 1) {
           continue;
         }
