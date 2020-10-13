@@ -90,7 +90,7 @@
 <div class="autocomplete-container">
   <input id="autocomplete" type="text" />
 </div>
-<div class="commercial-only-warning">
+<div id="commercial-only-warning" class="commercial-only-warning" style="display:none">
   Showing commercial results only. <a href="https://www.officialdata.org/ca-property-tax/">Full map</a>
 </div>
 
@@ -161,6 +161,9 @@
   let markerLayer = undefined;
 
   const showCommercialOnly = window.location.href.indexOf('commercial=1') > -1;
+  if (showCommercialOnly) {
+    document.getElementById('commercial-only-warning').style.display = 'block';
+  }
 
   const apnToMarkerCache = new LRU(10000);
 
