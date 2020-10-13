@@ -59,19 +59,20 @@ class GeoIndex {
     console.log('Loaded index');
   }
 
-  async getNearby(lat, lng, minX, minY, maxX, maxY) {
+  async getNearby(lat, lng, minX, minY, maxX, maxY, commercialOnly) {
     if (!this.index) {
       console.warn('Geo index not yet loaded');
       return [];
     }
 
-    const nearest = geokdbush.around(this.index, lng, lat, MAX_NUM_RESULTS * 4, MAX_RADIUS_KM);
+    const filterFn = commercialOnly ? (record) => record.address.indexOf('(Commercial)') > -1 : undefined;
+    const nearest = geokdbush.around(this.index, lng, lat, MAX_NUM_RESULTS * 4, MAX_RADIUS_KM, filterFn);
     return nearest.filter(record => {
       return minY <= record.lat && record.lat <= maxY && minX <= record.lng && record.lng <= maxX;
     }).slice(0, MAX_NUM_RESULTS);
   }
 
-  async getWithinBounds(minX, minY, maxX, maxY, zoom) {
+  async getWithinBounds(minX, minY, maxX, maxY, zoom, commercialOnly) {
     if (minX >= maxX || minY >= maxY) {
       console.log('Invalid bounds');
       return [];
@@ -81,7 +82,10 @@ class GeoIndex {
       return [];
     }
 
-    const nearest = this.index.range(minX, minY, maxX, maxY).map(idx => this.points[idx]);
+    let nearest = this.index.range(minX, minY, maxX, maxY).map(idx => this.points[idx]);
+    if (commercialOnly) {
+      nearest = nearest.filter((record) => record.address.indexOf('(Commercial)') > -1);
+    }
 
     //return getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
     if (nearest.length <= MAX_NUM_RESULTS) {
@@ -106,9 +110,12 @@ class GeoIndex {
         const y1Min = round(y1);
         const x1Max = round(x1 + gridX);
         const y1Max = round(y1 + gridY);
-        const gridContents = this.index.range(
+        let gridContents = this.index.range(
           x1Min, y1Min, x1Max, y1Max,
         ).slice(0, 10000).map(idx => this.points[idx]);
+        if (commercialOnly) {
+          gridContents = gridContents.filter((record) => record.address.indexOf('(Commercial)') > -1);
+        }
         if (gridContents.length < 1) {
           continue;
         }

@@ -8,6 +8,7 @@ async function caPropertyLookup(req, res) {
   const minY = parseFloat(req.query.minY);
   const maxX = parseFloat(req.query.maxX);
   const maxY = parseFloat(req.query.maxY);
+  const filter = req.query.filter;
 
   if (isNaN(lat) || isNaN(lng) || isNaN(zoom) || isNaN(minX) || isNaN(minY) || isNaN(maxX) || isNaN(maxY)) {
     res.status(500).json({
@@ -17,11 +18,12 @@ async function caPropertyLookup(req, res) {
     return;
   }
 
+  const commercialOnly = filter === 'commercial';
   let ret;
   if (zoom >= 18) {
-    ret = await GeoIndex.getNearby(lat, lng, minX, minY, maxX, maxY);
+    ret = await GeoIndex.getNearby(lat, lng, minX, minY, maxX, maxY, commercialOnly);
   } else {
-    ret = await GeoIndex.getWithinBounds(minX, minY, maxX, maxY, zoom);
+    ret = await GeoIndex.getWithinBounds(minX, minY, maxX, maxY, zoom, commercialOnly);
   }
   res.json({
     results: ret.map(loc => {
