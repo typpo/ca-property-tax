@@ -56,7 +56,7 @@ class GeoIndex {
 
     this.index = new KdBush(points, p => p.lng, p => p.lat);
     this.points = points;
-    console.log('Loaded index');
+    console.log('Loaded index:', points.length, 'locations');
   }
 
   async getNearby(lat, lng, minX, minY, maxX, maxY, commercialOnly) {
