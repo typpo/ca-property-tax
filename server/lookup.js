@@ -39,7 +39,7 @@ class GeoIndex {
   async load() {
     console.log('Loading index...');
     const gunzip = zlib.createGunzip();
-    const stream = fs.createReadStream(__dirname + '/../data/ca_all.csv.gz');
+    const stream = fs.createReadStream(__dirname + '/../data/bay_area_all.csv.gz');
 
     const parser = stream.pipe(gunzip).pipe(csvParse({
       relax_column_count_more: true,
@@ -47,10 +47,11 @@ class GeoIndex {
     const points = [];
     for await (const record of parser) {
       const [address, apn, lng, lat, tax, county, zone] = record;
-      if (tax <= 0 || !address || address === 'UNKNOWN') {
+      const taxNum = parseFloat(tax);
+      if (taxNum <= 0 || !address || address === 'UNKNOWN') {
         continue;
       }
-      points.push({ address, apn, county, tax: parseFloat(tax), lat: parseFloat(lat), lng: parseFloat(lng) });
+      points.push({ address, apn, county, tax: taxNum, lat: parseFloat(lat), lng: parseFloat(lng) });
     }
 
     this.index = new KdBush(points, p => p.lng, p => p.lat);

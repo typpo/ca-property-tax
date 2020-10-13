@@ -288,6 +288,11 @@
             taxUrl = `https://sanfrancisco-ca.county-taxes.com/public/search?search_query=${record.apn}&category=gsgx_property_tax`;
             countyStr = 'San Francisco';
             break;
+          case 'SCZ':
+            taxUrl = 'http://ttc.co.santa-cruz.ca.us/Taxbills/';
+            countyStr = 'Santa Cruz';
+            disclaimer = `<br>(2017 data, parcel ${record.apn})`;
+            break;
           case 'LA':
             taxUrl = 'https://vcheck.ttc.lacounty.gov/index.php';
             countyStr = 'Los Angeles';
