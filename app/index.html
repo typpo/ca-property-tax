@@ -319,7 +319,8 @@
         `;
         marker.bindPopup(popupContent);
 
-        marker.bindTooltip(`${abbreviated}k`, {
+        const tipText = abbreviated === '0' ? `${Math.round(record.tax)}` : `${abbreviated}k`;
+        marker.bindTooltip(tipText, {
           permanent: true,
           className: `maplabel tax-${taxclass}`,
           direction: 'center',
