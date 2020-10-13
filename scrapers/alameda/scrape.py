@@ -25,7 +25,7 @@ async def main():
 
         for record in reader:
             count += 1
-            #if count < 150000:
+            #if count < 440000:
             #    continue
 
             apn = record['APN'].strip()
