@@ -17,6 +17,7 @@ with open('/home/ian/Downloads/san_mateo_apn/san_mateo.geojson') as f_in, \
     for line in f_in:
         count += 1
         if count < 6:
+            # Skip geojson cruft left by conversion
             continue
         record = json.loads(line[:-2])
         apn = record['properties']['APN']

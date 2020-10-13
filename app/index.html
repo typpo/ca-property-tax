@@ -293,6 +293,10 @@
             countyStr = 'Santa Cruz';
             disclaimer = `<br>(2017 data, parcel ${record.apn})`;
             break;
+          case 'AL':
+            taxUrl = `https://www.acgov.org/ptax_pub_app/RealSearchInit.do?searchByParcel=true&parcelNumber=${record.apn}`;
+            countyStr = 'Alameda';
+            break;
           case 'LA':
             taxUrl = 'https://vcheck.ttc.lacounty.gov/index.php';
             countyStr = 'Los Angeles';
