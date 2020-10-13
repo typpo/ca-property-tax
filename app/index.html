@@ -146,6 +146,8 @@
       const place = autocomplete.getPlace();
       const lat = place.geometry.location.lat();
       const lng = place.geometry.location.lng();
+      lastZoom = undefined;
+      lastXY = undefined;
       map.flyTo([lat, lng], Math.max(map.getZoom(), 17));
 
       const placeMarker = L.marker([lat, lng],{
