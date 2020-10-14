@@ -54,4 +54,5 @@ A simple node app hosts the map and a `/lookup` endpoint.  On start it loads all
 
 - Add support for more counties
 - Expose a toggle for commercial/residential properties only (where data is available)
+- Obtain Redfin or Zillow or other property value estimates so that we can display property tax as a % of property value
 - Automatically surface interesting places?
