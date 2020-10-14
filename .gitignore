@@ -5,6 +5,9 @@
 scrapers/*/scrape_output/*.html
 venv
 
+### Allow example data ###
+!example_data.csv
+
 ### Vim ###
 [._]*.s[a-w][a-z]
 [._]s[a-w][a-z]
