@@ -2,11 +2,13 @@
 
 import csv
 import gzip
-import json
 import os
+import re
 import sys
 
 csv.field_size_limit(sys.maxsize)
+
+AMOUNT_REGEX = re.compile('installmentmoney fakeform\'>\$([,\.\d]+)</td>')
 
 def get_val(row, key):
     val = row[key].strip()
@@ -28,13 +30,36 @@ with open('/home/ian/Downloads/LA_County_Parcels.csv') as f_in, \
 
         apn = row['APN']
         address = row['SitusAddress']
+        print(count, apn, address)
+
         try:
             lat = float(row['CENTER_LAT'])
             lng = float(row['CENTER_LON'])
-
-            value = get_val(row, 'Roll_LandValue') + get_val(row, 'Roll_ImpValue') + get_val(row, 'Roll_PersPropValue') + get_val(row, 'Roll_FixtureValue') - get_val(row, 'Roll_HomeOwnersExemp') - get_val(row, 'Roll_RealEstateExemp') - get_val(row, 'Roll_PersPropExemp') - get_val(row, 'Roll_FixtureExemp')
-        except ValueError:
+        except:
+            print('-> bad latlng')
             continue
+
+        output_path = '/home/ian/code/prop13/scrapers/los_angeles/scrape_output/%s.html' % (apn)
+        if not os.path.exists(output_path):
+            print('-> no scraped file')
+            continue
+
+        try:
+            with gzip.open(output_path, 'rt') as f_in:
+                html = f_in.read()
+        except:
+            print('--> bad file')
+            continue
+
+        amount = -1
+        try:
+            amount_str = AMOUNT_REGEX.search(html).group(1).replace(',', '')
+            amount = float(amount_str)
+        except:
+            print('--> Could not parse float', amount_str)
+            continue
+
+        print('--> Paid', amount)
 
         zone = 'O'
         if row['UseType'] == 'Residential':
@@ -42,12 +67,14 @@ with open('/home/ian/Downloads/LA_County_Parcels.csv') as f_in, \
         elif row['UseType'] == 'Commercial':
             zone = 'C'
 
+        if zone == 'C':
+            address += ' (Commercial)'
+
         writer.writerow({
             'address': address,
             'apn': apn,
             'latitude': lat,
             'longitude': lng,
-            'tax': value * 0.016,
+            'tax': amount * 2,
             'county': 'LA',
-            'zone': zone,
         })

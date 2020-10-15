@@ -3,7 +3,6 @@
 import concurrent.futures
 import csv
 import gzip
-import json
 import os
 import sys
 
@@ -12,7 +11,6 @@ import requests
 csv.field_size_limit(sys.maxsize)
 
 CONNECTIONS = 10
-TIMEOUT = 10
 
 def process_apn(count, apn, output_path):
     print(count, 'Processing', apn)
@@ -22,9 +20,9 @@ def process_apn(count, apn, output_path):
         'page': apn_splits[1],
         'parcel': apn_splits[2],
         'year': '',
-        'token': '4f7dbc651b5e57ba69e41955ab7b3716b5c33a2992ee2b48b0fe20fec9b4e745',
+        'token': 'b43a4be6021c5f6c66992952a64847690bc7b589f80a13d9ee569a69d03242b8',
     }, cookies={
-        'SSID': 'o254h7hr4nfv8ffp252rqq1ggv',
+        'SSID': 'orv3ljjoc3tib7erdbg3c5mhio',
     }, headers={
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36',
     }, allow_redirects=True)
@@ -46,12 +44,11 @@ with open('/home/ian/Downloads/LA_County_Parcels.csv') as f_in:
     reader = csv.DictReader(f_in)
 
     futures = []
-
     with concurrent.futures.ThreadPoolExecutor(max_workers=CONNECTIONS) as executor:
         for record in reader:
             count += 1
-            if count > 1e6:
-                break
+            if count <= 2e6:
+                continue
             apn = record['APN']
             if not apn.strip():
                 continue

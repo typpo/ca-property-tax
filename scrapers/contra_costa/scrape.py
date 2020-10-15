@@ -39,7 +39,6 @@ with open('/home/ian/Downloads/contra_costa/contra_costa.geojson') as f_in:
                 continue
 
             futures.append(executor.submit(process_apn, count, apn, output_path))
-            break
 
     for future in concurrent.futures.as_completed(futures):
         data = future.result()
