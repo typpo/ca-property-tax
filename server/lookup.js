@@ -39,7 +39,7 @@ class GeoIndex {
   async load() {
     console.log('Loading index...');
     const gunzip = zlib.createGunzip();
-    const stream = fs.createReadStream(__dirname + '/../data/bay_area_all.csv.gz');
+    const stream = fs.createReadStream(__dirname + '/../data/ca_all.csv.gz');
 
     const parser = stream.pipe(gunzip).pipe(csvParse({
       relax_column_count_more: true,

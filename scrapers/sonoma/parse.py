@@ -31,7 +31,7 @@ with open('/home/ian/Downloads/Sonoma_Parcels.csv') as f_in, \
         print(count, apn, address, lat, lng)
 
         output_path = '/home/ian/code/prop13/scrapers/sonoma/scrape_output/%s.html' % (apn)
-        if os.path.exists(output_path):
+        if not os.path.exists(output_path):
             continue
 
         try:

@@ -12,4 +12,4 @@ The scraper requires a session cookie:
 - Complete the captcha
 - Go to property tax inquiry
 - Look up an AIN (like 5517-015-015) -> "Inquiry only"
-- Copy `token` form param and `SSID` cookie into the parser
+- Copy `token` form param and `SSID` cookie into the parser from POST request to https://vcheck.ttc.lacounty.gov/proptax.php?page=main

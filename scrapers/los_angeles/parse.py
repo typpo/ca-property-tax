@@ -39,7 +39,7 @@ with open('/home/ian/Downloads/LA_County_Parcels.csv') as f_in, \
             print('-> bad latlng')
             continue
 
-        output_path = '/home/ian/code/prop13/scrapers/los_angeles/scrape_output/%s.html' % (apn)
+        output_path = '/home/ian/code/prop13/scrapers/los_angeles/scrape_output_corrected/%s.html' % (apn)
         if not os.path.exists(output_path):
             print('-> no scraped file')
             continue

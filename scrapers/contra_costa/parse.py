@@ -5,15 +5,14 @@ import gzip
 import json
 import os
 
-from pyproj import Proj, transform
+from pyproj import Transformer
 from shapely.geometry import Polygon
 
 flatten=lambda l: sum(map(flatten,l),[]) if isinstance(l,list) else [l]
 
 # California Zone 3
 # https://epsg.io/2227
-inProj = Proj(init='epsg:2227', preserve_units = True)
-outProj = Proj(init='epsg:4326')
+transformer = Transformer.from_crs(2227, 4326)
 
 with open('/home/ian/Downloads/contra_costa/contra_costa.geojson') as f_in, \
      open('./parse_output.csv', 'w') as f_out:
@@ -27,7 +26,11 @@ with open('/home/ian/Downloads/contra_costa/contra_costa.geojson') as f_in, \
             # Skip geojson garbage
             continue
 
-        record = json.loads(line[:-2])
+        try:
+            record = json.loads(line[:-2])
+        except:
+            print('-> bad json')
+            continue
         apn = record['properties']['APN']
 
         # There is definitely a more correct way to do this.
@@ -42,7 +45,7 @@ with open('/home/ian/Downloads/contra_costa/contra_costa.geojson') as f_in, \
             print('-> could not find centroid')
             continue
 
-        centroid = transform(inProj,outProj,xy_centroid[0],xy_centroid[1])
+        centroid = transformer.transform(xy_centroid[0],xy_centroid[1])
 
         print(count, apn, centroid)
 
@@ -59,8 +62,12 @@ with open('/home/ian/Downloads/contra_costa/contra_costa.geojson') as f_in, \
                 continue
 
         address = record['details']['address']
-        installments = [installment for installment in record['installments'] if installment['type'] == 'SECURED']
-        amount = float(installments[-1]['amount'].replace(',', ''))
+        try:
+            installments = [installment for installment in record['installments'] if installment['type'] == 'SECURED']
+            amount = float(installments[-1]['amount'].replace(',', ''))
+        except (IndexError, ValueError):
+            print('-> bad value')
+            continue
 
         print('-> ', address, amount)
 

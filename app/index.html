@@ -399,7 +399,17 @@
           case 'LA':
             taxUrl = 'https://vcheck.ttc.lacounty.gov/index.php';
             countyStr = 'Los Angeles';
-            disclaimer = `est. based on <a href="https://www.latimes.com/local/la-me-city-property-tax-table-htmlstory.html">1.16%</a> average property tax rate. AIN ${record.apn}`;
+            disclaimer = `AIN ${record.apn}`;
+            break;
+          case 'SN':
+            const apnLookup = record.apn.replace(/-/g, '') + '000';
+            taxUrl = `https://common3.mptsweb.com/MBC/sonoma/tax/main/${apnLookup}/2020/2020`;
+            countyStr = 'Sonoma';
+            break;
+          case 'CC':
+            taxUrl = 'https://taxcolp.cccounty.us/taxpaymentrev3/lookup/';
+            countyStr = 'Contra Costa';
+            disclaimer = `Parcel # ${record.apn}`;
             break;
         }
         const realEstateQuery = `${record.address}, ${countyStr} CA (site:zillow.com OR site:redfin.com)`;
@@ -439,9 +449,9 @@
     });
   }
 
-  let initialLat = 37.5630;
-  let initialLng = -122.3255;
-  let initialZoom = 14;
+  let initialLat = 37.645771969647;
+  let initialLng = -122.14736938476564;
+  let initialZoom = 11;
 
   if (window.location.hash) {
     const ss = window.location.hash.slice(1).split(',');
