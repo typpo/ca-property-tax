@@ -16,6 +16,7 @@
       height: 100vh;
 
       font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Lato,Helvetica,Arial,sans-serif;
+      color: #404040;
     }
 
     #map { height: 100%; width: 100%; }
@@ -34,6 +35,49 @@
       bottom: 1em;
       left: 1em;
       z-index: 999;
+    }
+
+    .btn-info {
+      position: absolute;
+      bottom: 0.25em;
+      right: 0.25em;
+      z-index: 999;
+
+      padding: 0.5em;
+      text-align: center;
+      font-size: 1em;
+      font-weight: bold;
+
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5em;
+
+      cursor: pointer;
+    }
+
+    .btn-info:hover {
+      background-color: #eee;
+    }
+
+    .info-container {
+      position: absolute;
+      top: 25%;
+      left: 25%;
+      width: 50%;
+      margin: 0 auto;
+
+      padding: 2em;
+      z-index: 999;
+      background-color: #fff;
+      border: 1px solid #ccc;
+    }
+
+    .btn-close-info {
+      float: right;
+      margin-top: -1em;
+      margin-right: -1em;
+      font-size: 2em;
+      cursor: pointer;
     }
 
     #autocomplete {
@@ -81,7 +125,22 @@
       .autocomplete-container {
         width: 10em;
       }
-    }
+
+      .info-container {
+        top: 15%;
+        left: 0;
+        width: 99%;
+        padding: 0;
+      }
+
+      .info-container p {
+        padding: 1em;
+      }
+
+      .btn-close-info {
+        margin-top: 0;
+        margin-right: 0;
+      }
   </style>
 </head>
 <body>
@@ -95,6 +154,27 @@
 </div>
 <div id="commercial-only-warning" class="commercial-only-warning" style="display:none">
   Showing commercial results only. <a href="https://www.officialdata.org/ca-property-tax/">Full map</a>
+</div>
+<div id="btn-info" class="btn-info">
+  ❓
+</div>
+<div id="info-container" class="info-container" style="display:none">
+  <span id="btn-close-info" class="btn-close-info">✕</span>
+  <p>
+    This map is developed by <a href="https://www.ianww.com/">Ian Webster</a>.  Comments or questions?  Please reach out to <a href="https://twitter.com/iwebst">@iwebst</a> or <a href="mailto:taxmap@ianww.com">taxmap@ianww.com</a>.
+  </p>
+  <p>
+    The whole project is open-source and welcomes contributors!  <a href="https://github.com/typpo/ca-property-tax">Come join</a>.
+  </p>
+  <p>
+    <strong>Map legend</strong>
+    <ul>
+      <li><strong style="color:red">Red</strong> = highest 10% of tax in your viewport</li>
+      <li><strong style="color:green">Green</strong> = lowest 10% of tax in your viewport</li>
+      <li><strong>Black</strong> = individual property within the middle 80% of tax in your viewport</li>
+      <li><strong style="color:#DAA520">Yellow</strong> = cluster of multiple properties</li>
+    </ul>
+  </p>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
@@ -382,6 +462,7 @@
   const map = L.map('map', {
     preferCanvas: true,
     layers: [normal],
+    attributionControl: false,
   }).setView([initialLat, initialLng], initialZoom);
 
   L.control.layers({
@@ -414,6 +495,17 @@
   map.addLayer(markerGroups);
 
   loadMarkers();
+
+  function setupListeners() {
+    const modalElt = document.getElementById('info-container');
+    document.getElementById('btn-info').onclick = () => {
+      modalElt.style.display = 'block';
+    };
+    document.getElementById('btn-close-info').onclick = () => {
+      modalElt.style.display = 'none';
+    };
+  }
+  setupListeners();
 </script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-54607101-1" type="424f7e580cc64c3dc80265ff-text/javascript"></script>
 <script type="424f7e580cc64c3dc80265ff-text/javascript">
