@@ -50,7 +50,7 @@ async def main():
                 await page.click('#PaymentApplicationContent_lblSearchOption2')
                 await page.type('#PaymentApplicationContent_tbParcelNumber', apn)
                 await page.click('#PaymentApplicationContent_btnSubmitOption2')
-                await page.waitForNavigation({ 'waitUntil': 'domcontentloaded' })
+                await page.waitForNavigation({ 'waitUntil': 'domcontentloaded', 'timeout': 4000 })
                 html = await page.content()
                 await page.close()
                 await context.close()
