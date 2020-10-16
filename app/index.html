@@ -411,6 +411,10 @@
             countyStr = 'Contra Costa';
             disclaimer = `Parcel # ${record.apn}`;
             break;
+          case 'YOL':
+            taxUrl = `https://common2.mptsweb.com/MBC/yolo/tax/main/${record.apn}/2020/0000`;
+            countyStr = 'Yolo';
+            break;
         }
         const realEstateQuery = `${record.address}, ${countyStr} CA (site:zillow.com OR site:redfin.com)`;
         const popupContent = `
