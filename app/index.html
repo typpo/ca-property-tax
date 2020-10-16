@@ -322,6 +322,11 @@
     const resp = await fetch(`lookup?lat=${center.lat}&lng=${center.lng}&minX=${minX}&minY=${minY}&maxX=${maxX}&maxY=${maxY}&zoom=${zoom}&filter=${filter}`);
     const data = await resp.json();
 
+    if (data.errorCode === 'DATA_LOADING') {
+      alert('Please wait a moment and refresh the page, the map server is restarting because new data has been added.');
+      return;
+    }
+
     if (data.results.length < 1) {
       return;
     }

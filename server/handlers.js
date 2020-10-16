@@ -25,6 +25,13 @@ async function caPropertyLookup(req, res) {
   } else {
     ret = await GeoIndex.getWithinBounds(minX, minY, maxX, maxY, zoom, commercialOnly);
   }
+  if (ret === null) {
+    res.json({
+      errorCode: 'DATA_LOADING',
+      results: [],
+    });
+    return;
+  }
   res.json({
     results: ret.map(loc => {
       return [loc.address, loc.apn, loc.tax, loc.county, loc.lat, loc.lng];

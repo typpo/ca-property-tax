@@ -62,7 +62,7 @@ class GeoIndex {
   async getNearby(lat, lng, minX, minY, maxX, maxY, commercialOnly) {
     if (!this.index) {
       console.warn('Geo index not yet loaded');
-      return [];
+      return null;
     }
 
     const filterFn = commercialOnly ? (record) => record.address.indexOf('(Commercial)') > -1 : undefined;
@@ -79,7 +79,7 @@ class GeoIndex {
     }
     if (!this.index) {
       console.warn('Geo index not yet loaded');
-      return [];
+      return null;
     }
 
     let nearest = this.index.range(minX, minY, maxX, maxY).map(idx => this.points[idx]);
