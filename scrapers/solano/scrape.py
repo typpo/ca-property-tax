@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+
+import concurrent.futures
+import gzip
+import csv
+import os
+
+import requests
+
+CONNECTIONS = 20
+PARCEL_LOOKUP_URL = 'http://mpay.solanocounty.com/searchResults.asp?ParcelValue=%s'
+PARCEL_SOURCE_FILE = '/home/alin/Downloads/solano/Parcels2018.csv'
+OUTPUT_DIR = '/home/alin/code/prop13/scrapers/solano/scrape_output'
+
+def process_apn(count, apn, output_path):
+    print(count, 'Processing', apn)
+    form_data = {
+        'userOpt': '1',
+        'action': 'Detail',
+        'ParcelValue': apn,
+        'OccurValue': '01',
+        'BillType': 'SC',
+        'billAsmtYear': '',
+        'billEvent': '',
+        'billAmount': '',
+        'bill9972': 'no',
+        'DetailButton': 'Detail'
+    }
+    post_url = PARCEL_LOOKUP_URL % apn
+    resp = requests.post(PARCEL_LOOKUP_URL % apn, data=form_data)
+    if resp.status_code == 200:
+        html = resp.text
+        with gzip.open(output_path, 'wt') as f_out:
+            f_out.write(html)
+    else:
+        print('-> Failed with code', resp.status_code)
+
+with open(PARCEL_SOURCE_FILE) as f_in:
+    count = 0
+    futures = []
+    f_in_csv = csv.reader(f_in)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=CONNECTIONS) as executor:
+        for row in f_in_csv:
+            count += 1
+
+            if count < 2:
+                # header
+                continue
+
+            apn = row[0]
+
+            print('Queueing', count, apn)
+
+            output_path = (OUTPUT_DIR + '/%s.html') % (apn)
+            if os.path.exists(output_path):
+                continue
+
+            futures.append(executor.submit(process_apn, count, apn, output_path))
+
+    for future in concurrent.futures.as_completed(futures):
+        data = future.result()
+        print('Completed', data)
