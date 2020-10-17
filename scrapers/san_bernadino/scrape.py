@@ -55,6 +55,7 @@ def process_apn(count, apn, output_path):
             return
         with gzip.open(output_path, 'wt') as f_out:
             f_out.write(html)
+            f_out.flush()
     else:
         print('-> Req 2 failed with code', resp.status_code)
 
@@ -70,12 +71,15 @@ with open('/home/ian/Downloads/san_bernadino/sbdo.geojson') as f_in:
 
             record = json.loads(line[:-2])
             apn = record['properties']['ParcelNumb']
+            if not apn:
+                continue
 
             output_path = '/home/ian/code/prop13/scrapers/san_bernadino/scrape_output/%s.html' % (apn)
             if os.path.exists(output_path):
                 continue
 
-            futures.append(executor.submit(process_apn, count, apn, output_path))
+            print('queue', count, apn)
+            futures.append(executor.submit(process_apn, count, apn.strip(), output_path))
 
     for future in concurrent.futures.as_completed(futures):
         data = future.result()

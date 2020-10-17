@@ -16,9 +16,9 @@ def process_apn(count, apn, output_path):
         'page': apn_splits[1],
         'parcel': apn_splits[2],
         'year': '',
-        'token': 'f00fe327e7d5170ec10561f73a0861d2cd6b359db02cf99c6d4f1e0e6b1dfaac',
+        'token': 'dd1f2e78e528dfe54cdf5b6fb037f4757460173e6e8bda171f112b8e002282ef',
     }, cookies={
-        'SSID': '8v7vomunofn868besd8naiammq',
+        'SSID': 'enprmofm7vbq8hueu7823pragj',
     }, headers={
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36',
     }, allow_redirects=True)
