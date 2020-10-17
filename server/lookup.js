@@ -39,7 +39,7 @@ class GeoIndex {
   async load() {
     console.log('Loading index...');
     const gunzip = zlib.createGunzip();
-    const stream = fs.createReadStream(__dirname + '/../data/all_regions.csv.gz');
+    const stream = fs.createReadStream(__dirname + '/../data/ca_all.csv.gz');
 
     const parser = stream.pipe(gunzip).pipe(csvParse({
       relax_column_count_more: true,
@@ -62,7 +62,7 @@ class GeoIndex {
   async getNearby(lat, lng, minX, minY, maxX, maxY, commercialOnly) {
     if (!this.index) {
       console.warn('Geo index not yet loaded');
-      return [];
+      return null;
     }
 
     const filterFn = commercialOnly ? (record) => record.address.indexOf('(Commercial)') > -1 : undefined;
@@ -79,7 +79,7 @@ class GeoIndex {
     }
     if (!this.index) {
       console.warn('Geo index not yet loaded');
-      return [];
+      return null;
     }
 
     let nearest = this.index.range(minX, minY, maxX, maxY).map(idx => this.points[idx]);
