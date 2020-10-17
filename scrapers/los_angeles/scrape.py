@@ -11,17 +11,27 @@ csv.field_size_limit(sys.maxsize)
 
 def process_apn(count, apn, output_path):
     apn_splits = apn.split('-')
-    resp = requests.post('https://vcheck.ttc.lacounty.gov/proptax.php?page=main', data={
-        'mapbook': apn_splits[0],
-        'page': apn_splits[1],
-        'parcel': apn_splits[2],
-        'year': '',
-        'token': 'dd1f2e78e528dfe54cdf5b6fb037f4757460173e6e8bda171f112b8e002282ef',
-    }, cookies={
-        'SSID': 'enprmofm7vbq8hueu7823pragj',
-    }, headers={
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36',
-    }, allow_redirects=True)
+
+    retries = 0
+    while True:
+        try:
+            resp = requests.post('https://vcheck.ttc.lacounty.gov/proptax.php?page=main', data={
+                'mapbook': apn_splits[0],
+                'page': apn_splits[1],
+                'parcel': apn_splits[2],
+                'year': '',
+                'token': 'dd1f2e78e528dfe54cdf5b6fb037f4757460173e6e8bda171f112b8e002282ef',
+            }, cookies={
+                'SSID': 'enprmofm7vbq8hueu7823pragj',
+            }, headers={
+                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36',
+            }, allow_redirects=True)
+            break
+        except:
+            retries += 1
+            if retries > 3:
+                print('-> Complete failure')
+                sys.exit(1)
 
     if resp.status_code == 200:
         html = resp.text

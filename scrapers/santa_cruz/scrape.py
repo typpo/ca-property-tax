@@ -27,11 +27,20 @@ with open('/home/ian/Downloads/Santa_Cruz_Assessor_Parcels.csv') as f_in:
         if os.path.exists(output_path):
             continue
 
-        resp = requests.post('http://ttc.co.santa-cruz.ca.us/Taxbills/', params={
-            'Parcel': apn,
-        }, cookies={
-            'ASP.NET_SessionId': 'oqblcrejntdrhgxrsn33ubj1',
-        }, allow_redirects=True)
+        retries = 0
+        while True:
+            try:
+                resp = requests.post('http://ttc.co.santa-cruz.ca.us/Taxbills/', params={
+                    'Parcel': apn,
+                }, cookies={
+                    'ASP.NET_SessionId': 'oqblcrejntdrhgxrsn33ubj1',
+                }, allow_redirects=True)
+                break
+            except:
+                retries += 1
+                if retries > 3:
+                    print('-> Complete failure')
+                    sys.exit(1)
 
         if resp.status_code == 200:
             html = resp.text
