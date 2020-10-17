@@ -25,7 +25,7 @@
       position: absolute;
       top: 1em;
       left: 4em;
-      width: 35em;
+      width: 15em;
       height: 2em;
       z-index: 999;
     }
@@ -122,14 +122,8 @@
     }
 
     @media (max-width: 600px) {
-      .ap-dropdown-menu {
-        margin-left: -3em;
-        width: 90vw;
-        z-index: 9999999;
-      }
-
       .autocomplete-container {
-        max-width: 12em;
+        width: 10em;
       }
 
       .info-container {
@@ -156,7 +150,7 @@
 
 <div id="map"></div>
 <div class="autocomplete-container">
-  <input id="autocomplete" type="text" placeholder="Enter a location" />
+  <input id="autocomplete" type="text" />
 </div>
 <div id="commercial-only-warning" class="commercial-only-warning" style="display:none">
   Showing commercial results only. <a href="https://www.officialdata.org/ca-property-tax/">Full map</a>
@@ -190,7 +184,7 @@
  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
    crossorigin=""></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js" integrity="sha512-MQlyPV+ol2lp4KodaU/Xmrn+txc1TP15pOBF/2Sfre7MRsA/pB4Vy58bEqe9u7a7DczMLtU5wT8n7OblJepKbg==" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/places.js@1.19.0"></script>
+<script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVWwnb8PxtFjqLXATjEtIozN-ZDBMMIng&libraries=places&callback=setupAutoComplete">
 </script>
 <script>
   class LRU {
@@ -223,20 +217,21 @@
   }
 
   function setupAutoComplete() {
-    const placesAutocomplete = places({
-      appId: 'pl14HSY2UVYA',
-      apiKey: '3d466c58b6aaf70c6d9f6959c48d68b4',
-      container: document.getElementById('autocomplete'),
-    }).configure({
-      countries: ['us'],
-      aroundLatLng: '37.84964579824982,-122.01656341552736',
-      aroundRadius: 1000 * 1000, /* 1000 km */
-    });
+    const defaultBounds = new google.maps.LatLngBounds(
+      new google.maps.LatLng(38.502719,-121.5352957),
+      new google.maps.LatLng(37.108217,-122.5606637));
 
-    placesAutocomplete.on('change', (e) => {
-      const place = e.suggestion;
-      const lat = place.latlng.lat;
-      const lng = place.latlng.lng;
+    const input = document.getElementById('autocomplete');
+    const options = {
+      bounds: defaultBounds,
+    };
+
+    const autocomplete = new google.maps.places.Autocomplete(input, options);
+
+    google.maps.event.addListener(autocomplete, 'place_changed', function() {
+      const place = autocomplete.getPlace();
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
       lastZoom = undefined;
       lastXY = undefined;
       map.flyTo([lat, lng], Math.max(map.getZoom(), 17));
@@ -249,7 +244,6 @@
       });
     });
   }
-  setupAutoComplete();
 
   let markers = undefined;
   let markerLayer = undefined;
