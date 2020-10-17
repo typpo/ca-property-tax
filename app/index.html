@@ -22,6 +22,7 @@
     #map { height: 100%; width: 100%; }
 
     .autocomplete-container {
+      display: none;
       position: absolute;
       top: 1em;
       left: 4em;
@@ -184,8 +185,10 @@
  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
    crossorigin=""></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js" integrity="sha512-MQlyPV+ol2lp4KodaU/Xmrn+txc1TP15pOBF/2Sfre7MRsA/pB4Vy58bEqe9u7a7DczMLtU5wT8n7OblJepKbg==" crossorigin="anonymous"></script>
+<!--
 <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVWwnb8PxtFjqLXATjEtIozN-ZDBMMIng&libraries=places&callback=setupAutoComplete">
 </script>
+-->
 <script>
   class LRU {
     constructor(max = 10) {
