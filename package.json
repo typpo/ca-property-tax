@@ -2,6 +2,10 @@
   "name": "ca-property-tax",
   "version": "1.0.0",
   "main": "index.js",
+  "scripts": {
+    "populate": "python scrapers/collate_outputs.py",
+    "start": "node server/index.js"
+  },
   "author": "Ian Webster",
   "license": "MIT",
   "dependencies": {
