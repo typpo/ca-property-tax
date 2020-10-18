@@ -1,3 +1,7 @@
-Parcel data: https://hub.arcgis.com/datasets/DoITGIS::parcels2018-1
+Parcel data: https://hub.arcgis.com/datasets/DoITGIS::parcels2020
 
-TODO: How to convert Shape Area and Length to polygon, then centroid, then lat-long
+The Shapefile can be converted to GeoJSON:
+
+```
+ogr2ogr -f GeoJSON solano.geojson solano.shp
+```

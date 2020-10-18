@@ -9,7 +9,7 @@ import requests
 
 CONNECTIONS = 20
 PARCEL_LOOKUP_URL = 'http://mpay.solanocounty.com/searchResults.asp?ParcelValue=%s'
-PARCEL_SOURCE_FILE = '/home/alin/Downloads/solano/Parcels2018.csv'
+PARCEL_SOURCE_FILE = '/home/alin/Downloads/solano/Parcels2020.csv'
 OUTPUT_DIR = '/home/alin/code/prop13/scrapers/solano/scrape_output'
 
 def process_apn(count, apn, output_path):
@@ -39,15 +39,20 @@ with open(PARCEL_SOURCE_FILE) as f_in:
     count = 0
     futures = []
     f_in_csv = csv.reader(f_in)
+    apn_index = -1
     with concurrent.futures.ThreadPoolExecutor(max_workers=CONNECTIONS) as executor:
         for row in f_in_csv:
             count += 1
 
-            if count < 2:
-                # header
+            if count == 1:
+                apn_index = row.index('APN')
                 continue
 
-            apn = row[0]
+            if apn_index < 0:
+                print('Unable to locate APN index from header row')
+                raise
+
+            apn = row[apn_index]
 
             print('Queueing', count, apn)
 
