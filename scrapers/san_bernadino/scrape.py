@@ -36,7 +36,7 @@ def process_apn(count, apn, output_path):
         return
     enc = match.group(1)
     resp = requests.get('https://www.mytaxcollector.com/trPropInfo_CurrentTaxes.aspx?enc=%s' % enc, cookies={
-        'ASP.NET_SessionId': 'wnygyccl0tbxpoahgwgyasbo',
+        'ASP.NET_SessionId': '55qohxk0pojd0ho2a0auhhad',
     }, headers={
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36',
         'Referer': 'https://www.mytaxcollector.com/trSearchProcess.aspx',
@@ -65,6 +65,8 @@ with open('/home/ian/Downloads/san_bernadino/sbdo.geojson') as f_in:
     with concurrent.futures.ThreadPoolExecutor(max_workers=CONNECTIONS) as executor:
         for line in f_in:
             count += 1
+            if count < 550000:
+                continue
             if count < 6:
                 # Skip geojson garbage
                 continue

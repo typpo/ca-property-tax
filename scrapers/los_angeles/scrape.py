@@ -38,6 +38,8 @@ def process_apn(count, apn, output_path):
         if html.find('<b>Assessor ID Number:</b>') > -1 and html.find(apn) < 0:
             # They responded with the wrong number
             print('-> Bad APN response!!! Skipping')
+        if html.find('captcha') > -1:
+            print('-> captcha :O')
         else:
             with gzip.open(output_path, 'wt') as f_out:
                 f_out.write(html)
