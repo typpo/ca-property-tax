@@ -40,7 +40,7 @@ with open('/home/ian/Downloads/san_bernadino/sbdo.geojson') as f_in, \
 
         address = ''
         zone = record['properties']['AssessClas']
-        if zone and zone.find('Commercial') > -1:
+        if zone and zone.find('COMMERCIAL') > -1:
             address += ' (Commercial)'
 
         print(count, apn, address, centroid)
