@@ -425,6 +425,10 @@
             countyStr = 'Marin';
             disclaimer = `<br><br><strong>Warning</strong>: Due to a scraping issue, Marin properties sold within the last year are displaying incorrectly with low tax.  This issue affects a very small number of properties.  Please check the tax records before sharing.  APN ${record.apn}`;
             break;
+          case 'SOL':
+            taxUrl = `http://mpay.solanocounty.com/searchResults.asp?ParcelValue=${record.apn}`;
+            countyStr = 'Solano';
+            break;
         }
         const realEstateQuery = `${record.address}, ${countyStr} CA (site:zillow.com OR site:redfin.com)`;
         const popupContent = `
