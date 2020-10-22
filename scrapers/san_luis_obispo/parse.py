@@ -39,7 +39,7 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datasets/par
             print('-> blank APN')
             continue
 
-        print(count, apn)
+        print('->', count, apn)
 
         assessment_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scrape_output/%s.assessment.html' % (apn))
         if not os.path.exists(assessment_path):
@@ -54,11 +54,12 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datasets/par
 
         soup = BeautifulSoup(html, 'html.parser')
         address = soup.find(id='Main_lblAddressValue').text
+        structure_type = soup.find(id='Main_lblStructureTypeValue').text
 
         if address == ' ':
             continue
 
-        print('--> Address', address)
+        print('-> Address', address)
 
         tax_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scrape_output/%s.tax.html' % (apn))
         if not os.path.exists(assessment_path):
@@ -68,33 +69,42 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datasets/par
             with gzip.open(tax_path, 'rt') as f_in:
                 html = f_in.read()
         except:
-            print('--> bad file')
+            print('-> bad file')
             continue
 
         soup = BeautifulSoup(html, 'html.parser')
-        amount_str = soup.find(id='SecTaxBills_RadListView1_ctrl0_lblSecondInstallAmt').text.replace(',', '').replace('$', '')
+        amount_str = soup.select("tr[valign='top'] td:nth-child(2)")[0].text.strip().replace(',', '').replace('$', '')
 
         try:
             amount = float(amount_str)
         except:
-            print('--> Could not parse amount', amount_str)
+            print('-> Could not parse amount', amount_str)
             continue
 
-        print('--> Paid', amount)
+        print('-> Paid', amount)
 
         address_search = address.upper()
         address_match = None
 
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datasets/addresses.geojson')) as address_in:
-            for line in address_in:
-                if address_search in line:
-                    address_match = json.loads(line[:-2])
+        try:
+            with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datasets/addresses.geojson')) as address_in:
+                for line in address_in:
+                    if address_search in line:
+                        address_match = json.loads(line[:-2])
 
-            if not address_match:
-                print('--> No Address')
-                continue
+                if not address_match:
+                    print('-> No Address')
+                    continue
 
-            coords = address_match['geometry']['coordinates']
+                coords = address_match['geometry']['coordinates']
+        except:
+            print('-> bad address')
+            continue
+
+        is_commercial = structure_type.find('Commercial') > -1
+
+        if is_commercial:
+            address += ' (Commercial)'
 
         writer.writerow({
             'address': address,
