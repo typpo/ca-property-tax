@@ -25,3 +25,10 @@ The assessor's search is necessary to tie APN to address.
 https://services.slocountytax.org/Entry.aspx
 
 The tax search will provide 2020 property taxes for an APN.
+
+## Chromium Issues
+
+After around 1000 lines, The scraper will raise a bunch of "Timeout waiting for
+Navigation" exceptions and every subsequent connection to Chromium in the
+Python process will get stuck, so we use the `scrape.sh` bash script to scrape
+in batches of 500.
