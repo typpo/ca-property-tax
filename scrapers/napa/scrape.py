@@ -5,14 +5,20 @@ import gzip
 import csv
 import os
 import time
+import pathlib
 
 import requests
 
 CONNECTIONS = 20
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(SCRIPT_DIR, os.path.join('..', '..', 'outputs', 'napa'))
 PARCEL_LOOKUP_URL = 'https://common2.mptsweb.com/MBC/napa/tax/main/%s/2020/0000'
-PARCEL_SOURCE_FILE = '/home/alin/Downloads/napa/parcels_public.csv'
-OUTPUT_DIR = '/home/alin/code/prop13/scrapers/napa/scrape_output'
+PARCEL_SOURCE_FILE = os.path.join(DATA_DIR, 'parcels_public.csv')
+OUTPUT_DIR = os.path.join(DATA_DIR, 'scrape_output')
 SLEEP_TIME = 0.5
+
+# ensure the data directory is available
+pathlib.Path(SCRAPE_OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
 
 def process_apn(count, apn, output_path):
     print(count, 'Processing', apn)

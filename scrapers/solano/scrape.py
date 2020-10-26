@@ -4,13 +4,19 @@ import concurrent.futures
 import gzip
 import csv
 import os
+import pathlib
 
 import requests
 
 CONNECTIONS = 20
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(SCRIPT_DIR, os.path.join('..', '..', 'outputs', 'solano'))
 PARCEL_LOOKUP_URL = 'http://mpay.solanocounty.com/searchResults.asp?ParcelValue=%s'
-PARCEL_SOURCE_FILE = '/home/alin/Downloads/solano/Parcels2020.csv'
-OUTPUT_DIR = '/home/alin/code/prop13/scrapers/solano/scrape_output'
+PARCEL_SOURCE_FILE = os.path.join(DATA_DIR, 'Parcels2020.csv')
+OUTPUT_DIR = os.path.join(DATA_DIR, 'scrape_output')
+
+# ensure the data directory is available
+pathlib.Path(SCRAPE_OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
 
 def process_apn(count, apn, output_path):
     print(count, 'Processing', apn)

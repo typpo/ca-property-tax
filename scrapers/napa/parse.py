@@ -6,16 +6,22 @@ import json
 import os
 import re
 import sys
+import pathlib
 
 from shapely.geometry import Polygon
 
 csv.field_size_limit(sys.maxsize)
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(SCRIPT_DIR, os.path.join('..', '..', 'outputs', 'napa'))
 ADDRESS_REGEX = re.compile('Address.*\n[^.*\>]+\>([^\<]+).*\n.*\n[^.*\>]+\>([^\<]+)')
 AMOUNTS_REGEX = re.compile('h4\>Totals\s\-.*\n.*\n.*\n.*\>Total Due\<.*\n[^\>]+\>([^\<]+)')
-GEOJSON_FILE = '/home/alin/Downloads/napa/napa.geojson'
-OUTPUT_FILE = '/home/alin/code/prop13/scrapers/napa/parse_output.csv'
-SCRAPE_OUTPUT_DIR = '/home/alin/code/prop13/scrapers/napa/scrape_output'
+GEOJSON_FILE = os.path.join(DATA_DIR, 'napa.geojson')
+OUTPUT_FILE = os.path.join(DATA_DIR, 'parse_output.csv')
+SCRAPE_OUTPUT_DIR = os.path.join(DATA_DIR, 'scrape_output')
+
+# ensure the data directory is available
+pathlib.Path(SCRAPE_OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
 
 flatten=lambda l: sum(map(flatten, l),[]) if isinstance(l,list) else [l]
 

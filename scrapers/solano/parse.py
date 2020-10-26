@@ -6,20 +6,26 @@ import json
 import os
 import re
 import sys
+import pathlib
 
 from shapely.geometry import Polygon
 
 csv.field_size_limit(sys.maxsize)
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(SCRIPT_DIR, os.path.join('..', '..', 'outputs', 'solano'))
 ADDRESS_REGEX = re.compile('Property\sType.*\n.*\n.*\n[^.*\>]+\>([^\<]+)\<')
 AMOUNTS_REGEX = re.compile('\>Total\<.*\n.*.*\n[^\>]+\>([^\<]+).*\n[^\>]+\>([^\<]+).*\n')
-GEOJSON_FILE = '/home/alin/Downloads/solano/solano.geojson.gz'
-OUTPUT_FILE = '/home/alin/code/prop13/scrapers/solano/parse_output.csv'
-SCRAPE_OUTPUT_DIR = '/home/alin/code/prop13/scrapers/solano/scrape_output'
+GEOJSON_FILE = os.path.join(DATA_DIR, 'solano.geojson')
+OUTPUT_FILE = os.path.join(DATA_DIR, 'parse_output.csv')
+SCRAPE_OUTPUT_DIR = os.path.join(DATA_DIR, 'scrape_output')
+
+# ensure the data directory is available
+pathlib.Path(SCRAPE_OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
 
 flatten=lambda l: sum(map(flatten,l),[]) if isinstance(l,list) else [l]
 
-with gzip.open(GEOJSON_FILE) as f_in, \
+with open(GEOJSON_FILE) as f_in, \
      open(OUTPUT_FILE, 'w') as f_out:
 
     fieldnames = ['address', 'apn', 'longitude', 'latitude', 'tax', 'county']
