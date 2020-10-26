@@ -144,7 +144,7 @@
 
 <div id="map"></div>
 <div class="autocomplete-container">
-  <input id="autocomplete" type="text" />
+  <input id="autocomplete" type="text" placeholder="Enter a full address" />
 </div>
 <div id="commercial-only-warning" class="commercial-only-warning" style="display:none">
   Showing commercial results only. <a href="https://www.officialdata.org/ca-property-tax/">Full map</a>
@@ -216,32 +216,51 @@
     }
   }
 
-  function setupAutoComplete() {
+  function searchForAddress(address) {
     const defaultBounds = new google.maps.LatLngBounds(
       new google.maps.LatLng(38.502719,-121.5352957),
       new google.maps.LatLng(37.108217,-122.5606637));
 
-    const input = document.getElementById('autocomplete');
-    const options = {
+    const geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({
+      address,
       bounds: defaultBounds,
-    };
+    }, (results, status) => {
+      if (status === 'OK') {
+        if (results.length < 1) {
+          alert('No results found, please check your input.');
+          return;
+        }
+        const place = results[0];
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        lastZoom = undefined;
+        lastXY = undefined;
+        map.flyTo([lat, lng], Math.max(map.getZoom(), 17));
 
-    const autocomplete = new google.maps.places.Autocomplete(input, options);
+        const placeMarker = L.marker([lat, lng],{
+          zIndexOffset: 999,
+        }).addTo(map);
+        placeMarker.on('click', function() {
+          map.removeLayer(placeMarker);
+        });
+      } else {
+        alert("Geocode was not successful for the following reason: " + status);
+      }
+    });
+  }
 
-    google.maps.event.addListener(autocomplete, 'place_changed', function() {
-      const place = autocomplete.getPlace();
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-      lastZoom = undefined;
-      lastXY = undefined;
-      map.flyTo([lat, lng], Math.max(map.getZoom(), 17));
-
-      const placeMarker = L.marker([lat, lng],{
-        zIndexOffset: 999,
-      }).addTo(map);
-      placeMarker.on('click', function() {
-        map.removeLayer(placeMarker);
-      });
+  function setupAutoComplete() {
+    const input = document.getElementById('autocomplete');
+    input.addEventListener('keyup', (e) => {
+      if (e.keyCode !== 13 && e.key !== 'Enter') {
+        return;
+      }
+      if (input.value.length < 3) {
+        return;
+      }
+      searchForAddress(input.value);
     });
   }
 
