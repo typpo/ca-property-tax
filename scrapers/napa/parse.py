@@ -12,15 +12,13 @@ from shapely.geometry import Polygon
 csv.field_size_limit(sys.maxsize)
 
 ADDRESS_REGEX = re.compile('Address.*\n[^.*\>]+\>([^\<]+).*\n.*\n[^.*\>]+\>([^\<]+)')
-AMOUNTS_REGEX = re.compile('\>Total Due\<.*\n[^\>]+\>([^\<]+)')
+AMOUNTS_REGEX = re.compile('h4\>Totals\s\-.*\n.*\n.*\n.*\>Total Due\<.*\n[^\>]+\>([^\<]+)')
 GEOJSON_FILE = '/home/alin/Downloads/napa/napa.geojson'
 OUTPUT_FILE = '/home/alin/code/prop13/scrapers/napa/parse_output.csv'
 SCRAPE_OUTPUT_DIR = '/home/alin/code/prop13/scrapers/napa/scrape_output'
 
-flatten=lambda l: sum(map(flatten,l),[]) if isinstance(l,list) else [l]
+flatten=lambda l: sum(map(flatten, l),[]) if isinstance(l,list) else [l]
 
-2784885.618484084,2784885.4214996574
-38.317145, -122.294374
 with open(GEOJSON_FILE) as f_in, \
      open(OUTPUT_FILE, 'w') as f_out:
 
@@ -49,7 +47,8 @@ with open(GEOJSON_FILE) as f_in, \
             print('-> skip')
             continue
         # There is definitely a more correct way to do this.
-        flat_coords = flatten(record['geometry']['coordinates'])
+        flat_coords = [[xyz[0], xyz[1]] for coords in record['geometry']['coordinates'] for xyz in coords]
+        flat_coords = flatten(flat_coords)
         coords = zip(flat_coords[0::2], flat_coords[1::2])
 
         try:
