@@ -10,7 +10,7 @@ from pyproj import Transformer
 
 csv.field_size_limit(sys.maxsize)
 
-AMOUNT_REGEX = re.compile('Both Installment[\s\S]+\$([\d,\.]+)')
+AMOUNT_REGEX = re.compile('Both Installment[\s\S]+?\$([\d,\.]+)')
 
 # California Zone 3
 # https://epsg.io/2227
