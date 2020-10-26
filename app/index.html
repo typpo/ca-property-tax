@@ -447,6 +447,10 @@
             countyStr = 'Marin';
             disclaimer = `<br><br><strong>Warning</strong>: Due to a scraping issue, Marin properties sold within the last year are displaying incorrectly with low tax.  This issue affects a very small number of properties.  Please check the tax records before sharing.  APN ${record.apn}`;
             break;
+          case 'NAPA':
+            taxUrl = `https://common2.mptsweb.com/MBC/napa/tax/main/${record.apn}/2020/0000`;
+            countyStr = 'Napa';
+            break;
           case 'SOL':
             taxUrl = `http://mpay.solanocounty.com/searchResults.asp?ParcelValue=${record.apn}`;
             countyStr = 'Solano';

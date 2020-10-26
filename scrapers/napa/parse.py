@@ -13,17 +13,17 @@ from shapely.geometry import Polygon
 csv.field_size_limit(sys.maxsize)
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(SCRIPT_DIR, os.path.join('..', '..', 'outputs', 'solano'))
-ADDRESS_REGEX = re.compile('Property\sType.*\n.*\n.*\n[^.*\>]+\>([^\<]+)\<')
-AMOUNTS_REGEX = re.compile('\>Total\<.*\n.*.*\n[^\>]+\>([^\<]+).*\n[^\>]+\>([^\<]+).*\n')
-GEOJSON_FILE = os.path.join(DATA_DIR, 'solano.geojson')
+DATA_DIR = os.path.join(SCRIPT_DIR, os.path.join('..', '..', 'outputs', 'napa'))
+ADDRESS_REGEX = re.compile('Address.*\n[^.*\>]+\>([^\<]+).*\n.*\n[^.*\>]+\>([^\<]+)')
+AMOUNTS_REGEX = re.compile('h4\>Totals\s\-.*\n.*\n.*\n.*\>Total Due\<.*\n[^\>]+\>([^\<]+)')
+GEOJSON_FILE = os.path.join(DATA_DIR, 'napa.geojson')
 OUTPUT_FILE = os.path.join(DATA_DIR, 'parse_output.csv')
 SCRAPE_OUTPUT_DIR = os.path.join(DATA_DIR, 'scrape_output')
 
 # ensure the data directory is available
 pathlib.Path(SCRAPE_OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
 
-flatten=lambda l: sum(map(flatten,l),[]) if isinstance(l,list) else [l]
+flatten=lambda l: sum(map(flatten, l),[]) if isinstance(l,list) else [l]
 
 with open(GEOJSON_FILE) as f_in, \
      open(OUTPUT_FILE, 'w') as f_out:
@@ -38,20 +38,23 @@ with open(GEOJSON_FILE) as f_in, \
             continue
 
         try:
-            json_to_parse = line[:-1] if line.decode('utf-8').endswith('}\n') else line[:-2]
+            json_to_parse = line.strip()
+            if json_to_parse.endswith(','):
+                json_to_parse = json_to_parse[:-1]
             record = json.loads(json_to_parse)
         except:
             print('-> could not parse JSON on line %d' % (count,))
             continue
 
-        apn = record['properties']['APN']
+        apn = record['properties']['ASMT']
         if not apn:
             continue
         if not record['geometry'] or not record['geometry']['coordinates']:
             print('-> skip')
             continue
         # There is definitely a more correct way to do this.
-        flat_coords = flatten(record['geometry']['coordinates'])
+        flat_coords = [[xyz[0], xyz[1]] for coords in record['geometry']['coordinates'] for xyz in coords]
+        flat_coords = flatten(flat_coords)
         coords = zip(flat_coords[0::2], flat_coords[1::2])
 
         try:
@@ -76,9 +79,8 @@ with open(GEOJSON_FILE) as f_in, \
 
         try:
             amounts_grps = AMOUNTS_REGEX.search(html)
-            for x in range(1, 3):
-                amount_str = amounts_grps.group(x).replace(',', '').replace('$', '')
-                amount += float(amount_str)
+            amount_str = amounts_grps.group(1).replace(',', '').replace('$', '')
+            amount += float(amount_str)
         except:
             print('--> Could not parse float %s' % apn)
             amount = -1
@@ -87,7 +89,11 @@ with open(GEOJSON_FILE) as f_in, \
         address = None
 
         try:
-            address = ADDRESS_REGEX.search(html).group(1).replace('&nbsp;', ' ').strip()
+            address_grps = ADDRESS_REGEX.search(html)
+            address_parts = []
+            for x in range(1, 3):
+                address_parts.append(' '.join(map(lambda wd: wd if wd == 'CA' else wd.lower().capitalize(), address_grps.group(x).strip().split())))
+            address = ', '.join(address_parts)
         except:
             print('--> Could not find address for %s' % apn)
             continue
@@ -100,5 +106,5 @@ with open(GEOJSON_FILE) as f_in, \
             'latitude': centroid[1],
             'longitude': centroid[0],
             'tax': amount,
-            'county': 'SOL',
+            'county': 'NAPA',
         })
