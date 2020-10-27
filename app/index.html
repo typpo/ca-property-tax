@@ -415,7 +415,8 @@
             countyStr = 'San Francisco';
             break;
           case 'SCZ':
-            taxUrl = 'http://ttc.co.santa-cruz.ca.us/Taxbills/';
+            const apnLookup = record.apn.replace(/-/g, '');
+            taxUrl = `https://sccounty01.co.santa-cruz.ca.us/ASR/ParcelList/linkHREF?txtAPN=${apnLookup}`;
             countyStr = 'Santa Cruz';
             disclaimer = `Parcel number ${record.apn}`;
             break;
