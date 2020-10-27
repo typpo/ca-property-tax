@@ -469,6 +469,11 @@
             disclaimer = `Assessment Number ${record.apn}`;
             countyStr = 'San Luis Obispo';
             break;
+          case 'SD':
+            taxUrl = 'https://iwr.sdttc.com/paymentapplication/Search.aspx'
+            disclaimer = `<br>Assessor Parcel Number ${record.apn}`;
+            countyStr = 'San Diego';
+            break;
         }
         const realEstateQuery = `${record.address}, ${countyStr} CA (site:zillow.com OR site:redfin.com)`;
         const popupContent = `
