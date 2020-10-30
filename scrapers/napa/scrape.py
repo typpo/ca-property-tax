@@ -14,7 +14,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, os.path.join('..', '..', 'outputs', 'napa'))
 PARCEL_LOOKUP_URL = 'https://common2.mptsweb.com/MBC/napa/tax/main/%s/2020/0000'
 PARCEL_SOURCE_FILE = os.path.join(DATA_DIR, 'parcels_public.csv')
-OUTPUT_DIR = os.path.join(DATA_DIR, 'scrape_output')
+SCRAPE_OUTPUT_DIR = os.path.join(DATA_DIR, 'scrape_output')
 SLEEP_TIME = 0.5
 
 # ensure the data directory is available
@@ -26,7 +26,7 @@ def process_apn(count, apn, output_path):
         'https': 'https://104.149.139.206:3128'
     }
     get_url = PARCEL_LOOKUP_URL % apn
-    resp = requests.get(PARCEL_LOOKUP_URL % apn, proxies=proxyDict)
+    resp = requests.get(get_url, proxies=proxyDict)
     if resp.status_code == 200:
         html = resp.text
         with gzip.open(output_path, 'wt') as f_out:
@@ -56,7 +56,7 @@ with open(PARCEL_SOURCE_FILE) as f_in:
 
             print('Queueing', count, apn)
 
-            output_path = (OUTPUT_DIR + '/%s.html') % (apn)
+            output_path = (SCRAPE_OUTPUT_DIR + '/%s.html') % (apn)
             if os.path.exists(output_path):
                 continue
 

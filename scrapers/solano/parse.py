@@ -37,8 +37,10 @@ with open(GEOJSON_FILE) as f_in, \
             # Skip geojson cruft left by conversion
             continue
 
+        json_to_parse = line.strip()
+        if json_to_parse.endswith(','):
+            json_to_parse = json_to_parse[:-1]
         try:
-            json_to_parse = line[:-1] if line.decode('utf-8').endswith('}\n') else line[:-2]
             record = json.loads(json_to_parse)
         except:
             print('-> could not parse JSON on line %d' % (count,))

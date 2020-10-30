@@ -13,7 +13,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, os.path.join('..', '..', 'outputs', 'solano'))
 PARCEL_LOOKUP_URL = 'http://mpay.solanocounty.com/searchResults.asp?ParcelValue=%s'
 PARCEL_SOURCE_FILE = os.path.join(DATA_DIR, 'Parcels2020.csv')
-OUTPUT_DIR = os.path.join(DATA_DIR, 'scrape_output')
+SCRAPE_OUTPUT_DIR = os.path.join(DATA_DIR, 'scrape_output')
 
 # ensure the data directory is available
 pathlib.Path(SCRAPE_OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
@@ -33,7 +33,7 @@ def process_apn(count, apn, output_path):
         'DetailButton': 'Detail'
     }
     post_url = PARCEL_LOOKUP_URL % apn
-    resp = requests.post(PARCEL_LOOKUP_URL % apn, data=form_data)
+    resp = requests.post(post_url, data=form_data)
     if resp.status_code == 200:
         html = resp.text
         with gzip.open(output_path, 'wt') as f_out:
@@ -62,7 +62,7 @@ with open(PARCEL_SOURCE_FILE) as f_in:
 
             print('Queueing', count, apn)
 
-            output_path = (OUTPUT_DIR + '/%s.html') % (apn)
+            output_path = (SCRAPE_OUTPUT_DIR + '/%s.html') % (apn)
             if os.path.exists(output_path):
                 continue
 

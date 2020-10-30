@@ -439,6 +439,11 @@
             taxUrl = `http://mpay.solanocounty.com/searchResults.asp?ParcelValue=${record.apn}`;
             countyStr = 'Solano';
             break;
+          case 'FRE':
+            taxUrl = `https://www2.co.fresno.ca.us/0410/FresnoTTCPaymentApplication/Welcome.aspx`;
+            disclaimer = `Parcel Number ${record.apn}`;
+            countyStr = 'Fresno';
+            break;
           case 'SBDO':
             taxUrl = 'https://www.mytaxcollector.com/trSearch.aspx';
             disclaimer = `Parcel Number ${record.apn}`;
