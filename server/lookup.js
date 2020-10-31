@@ -87,7 +87,7 @@ class GeoIndex {
     console.log('Selecting random from', rawResults.length, commercialOnly);
 
     let rawResultsRandom = rawResults;
-    if (rawResult.length > MAX_NUM_RESULTS) {
+    if (rawResults.length > MAX_NUM_RESULTS) {
       rawResultsRandom = getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
     }
     let nearest = rawResultsRandom.map(idx => this.points[idx]);
