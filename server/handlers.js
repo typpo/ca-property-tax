@@ -26,7 +26,7 @@ async function caPropertyLookup(req, res) {
     ret = await GeoIndex.getWithinBounds(minX, minY, maxX, maxY, zoom, commercialOnly);
   }
   if (ret === null) {
-    res.json({
+    res.status(500).json({
       errorCode: 'DATA_LOADING',
       results: [],
     });
