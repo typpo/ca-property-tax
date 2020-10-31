@@ -88,7 +88,7 @@ class GeoIndex {
 
     let rawResultsRandom = rawResults;
     if (rawResults.length > MAX_NUM_RESULTS) {
-      rawResultsRandom = getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
+      rawResultsRandom = getRandom(rawResults, Math.min(rawResults.length, MAX_NUM_RESULTS));
     }
     let nearest = rawResultsRandom.map(idx => this.points[idx]);
     if (commercialOnly) {
