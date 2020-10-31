@@ -83,13 +83,18 @@ class GeoIndex {
       return null;
     }
 
-    let nearest = this.index.range(minX, minY, maxX, maxY).map(idx => this.points[idx]);
+    const rawResults = this.index.range(minX, minY, maxX, maxY);
+    console.log('Selecting random from', rawResults.length, commercialOnly);
+
+    let rawResultsRandom = rawResults;
+    if (rawResult.length > MAX_NUM_RESULTS) {
+      rawResultsRandom = getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
+    }
+    let nearest = rawResultsRandom.map(idx => this.points[idx]);
     if (commercialOnly) {
       nearest = nearest.filter((record) => record.address.indexOf('(Commercial)') > -1);
     }
-
-    console.log('Selecting random from', nearest.length, commercialOnly);
-    return getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
+    return nearest;
     /*
     if (nearest.length <= MAX_NUM_RESULTS) {
       return nearest;

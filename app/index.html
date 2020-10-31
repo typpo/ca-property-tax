@@ -526,9 +526,11 @@
   }
 
   const normal = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}.png', {
+    minZoom: 11,
     maxZoom: 20,
   });
   const satellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+    minZoom: 11,
     maxZoom: 20,
   });
 
