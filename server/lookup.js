@@ -13,9 +13,9 @@ const NUM_GRIDS = 8;
 const GRID_NUM_DECIMALS_ROUNDED = 3;
 
 function getRandom(arr, n) {
-  const result = new Array(n);
   const len = arr.length;
-  const taken = new Array(len);
+  let result = new Array(n);
+  let taken = new Array(len);
   if (n > len)
     throw new RangeError('getRandom: more elements taken than available');
   while (n--) {
