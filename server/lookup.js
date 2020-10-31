@@ -87,7 +87,8 @@ class GeoIndex {
       nearest = nearest.filter((record) => record.address.indexOf('(Commercial)') > -1);
     }
 
-    //return getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
+    return getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
+    /*
     if (nearest.length <= MAX_NUM_RESULTS) {
       return nearest;
     }
@@ -136,6 +137,7 @@ class GeoIndex {
       }
     }
     return ret;
+    */
   }
 }
 
