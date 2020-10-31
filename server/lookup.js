@@ -13,7 +13,7 @@ const NUM_GRIDS = 8;
 const GRID_NUM_DECIMALS_ROUNDED = 3;
 
 function getRandom(arr, n) {
-  const len = arr.length;
+  let len = arr.length;
   let result = new Array(n);
   let taken = new Array(len);
   if (n > len)
