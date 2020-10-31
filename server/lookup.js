@@ -67,6 +67,7 @@ class GeoIndex {
 
     const filterFn = commercialOnly ? (record) => record.address.indexOf('(Commercial)') > -1 : undefined;
     const nearest = geokdbush.around(this.index, lng, lat, MAX_NUM_RESULTS * 4, MAX_RADIUS_KM, filterFn);
+    console.log('Selecting nearest from', nearest.length, commercialOnly);
     return nearest.filter(record => {
       return minY <= record.lat && record.lat <= maxY && minX <= record.lng && record.lng <= maxX;
     }).slice(0, MAX_NUM_RESULTS);
@@ -87,6 +88,7 @@ class GeoIndex {
       nearest = nearest.filter((record) => record.address.indexOf('(Commercial)') > -1);
     }
 
+    console.log('Selecting random from', nearest.length, commercialOnly);
     return getRandom(nearest, Math.min(nearest.length, MAX_NUM_RESULTS));
     /*
     if (nearest.length <= MAX_NUM_RESULTS) {
