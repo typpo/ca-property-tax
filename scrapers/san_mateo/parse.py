@@ -33,7 +33,7 @@ with open('/home/ian/Downloads/san_mateo_apn/san_mateo.geojson') as f_in, \
         output_path = '/home/ian/code/prop13/scrapers/san_mateo/scrape_output/%s.html' % (apn)
         if not os.path.exists(output_path):
             print(apn, 'record does not exist')
-            break
+            continue
 
         try:
             with gzip.open(output_path, 'rt') as f_in:
