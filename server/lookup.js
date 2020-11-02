@@ -99,8 +99,7 @@ class GeoIndex {
     if (commercialOnly) {
       nearest = nearest.filter((record) => record.address.indexOf('(Commercial)') > -1);
     }
-    return nearest;
-    /*
+    //return nearest;
     if (nearest.length <= MAX_NUM_RESULTS) {
       return nearest;
     }
@@ -149,7 +148,6 @@ class GeoIndex {
       }
     }
     return ret;
-    */
   }
 }
 
