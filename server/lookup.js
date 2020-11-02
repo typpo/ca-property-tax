@@ -1,9 +1,9 @@
 const fs = require('fs');
 const zlib = require('zlib');
 
-const csvParse = require('csv-parse');
-const geokdbush = require('geokdbush');
 const KdBush = require('kdbush');
+const Papa = require('papaparse');
+const geokdbush = require('geokdbush');
 
 const MAX_NUM_RESULTS = 250;
 
@@ -37,26 +37,31 @@ class GeoIndex {
   }
 
   async load() {
+    const start = process.hrtime()[0];
     console.log('Loading index...');
     const gunzip = zlib.createGunzip();
     const stream = fs.createReadStream(__dirname + '/../data/ca_all.csv.gz');
 
-    const parser = stream.pipe(gunzip).pipe(csvParse({
-      relax_column_count_more: true,
-    }));
     const points = [];
-    for await (const record of parser) {
-      const [address, apn, lng, lat, tax, county, zone] = record;
-      const taxNum = parseFloat(tax);
-      if (taxNum <= 0 || address === 'UNKNOWN') {
-        continue;
-      }
-      points.push({ address, apn, county, tax: taxNum, lat: parseFloat(lat), lng: parseFloat(lng) });
-    }
-
-    this.index = new KdBush(points, p => p.lng, p => p.lat);
-    this.points = points;
-    console.log('Loaded index:', points.length, 'locations');
+    Papa.parse(stream.pipe(gunzip), {
+      delimiter: ',',
+      quoteChart: '"',
+      step: (results, parser) => {
+        const record = results.data;
+        const [address, apn, lng, lat, tax, county, zone] = record;
+        const taxNum = parseFloat(tax);
+        if (taxNum <= 0 || address === 'UNKNOWN') {
+          return;
+        }
+        points.push({ address, apn, county, tax: taxNum, lat: parseFloat(lat), lng: parseFloat(lng) });
+      },
+      complete: () => {
+        this.index = new KdBush(points, p => p.lng, p => p.lat);
+        this.points = points;
+        const durationSec = process.hrtime()[0] - start;
+        console.log('Loaded index:', points.length, 'locations', durationSec, 'seconds');
+      },
+    });
   }
 
   async getNearby(lat, lng, minX, minY, maxX, maxY, commercialOnly) {
