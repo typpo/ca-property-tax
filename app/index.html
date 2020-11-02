@@ -400,6 +400,7 @@
 
         let taxUrl;
         let countyStr;
+        let apnLookup;
         let disclaimer = '';
         switch(record.county.trim()) {
           case 'SM':
@@ -429,7 +430,7 @@
             disclaimer = `AIN ${record.apn}`;
             break;
           case 'SN':
-            const apnLookup = record.apn.replace(/-/g, '') + '000';
+            apnLookup = record.apn.replace(/-/g, '') + '000';
             taxUrl = `https://common3.mptsweb.com/MBC/sonoma/tax/main/${apnLookup}/2020/2020`;
             countyStr = 'Sonoma';
             break;
@@ -473,6 +474,11 @@
             taxUrl = 'https://iwr.sdttc.com/paymentapplication/Search.aspx'
             disclaimer = `<br>Assessor Parcel Number ${record.apn}`;
             countyStr = 'San Diego';
+            break;
+          case 'OC':
+            apnLookup = record.apn.replace(/-/g, '');
+            taxUrl = `http://tax.ocgov.com/tcweb/detail_sec.asp?ReqParcel=${record.apn}&StreetNo=&Direction=&StreetName=&APN=${apnLookup}&Suffix=00&CmpRevDte=79799276&RollTypCde=Secured&Code=A&StSuffix=&City=&Unit=&s=1&p=1&t=&TaxYr=2020&CurYr=2020`;
+            countyStr = 'Orange County';
             break;
         }
         const realEstateQuery = `${record.address}, ${countyStr} CA (site:zillow.com OR site:redfin.com)`;
