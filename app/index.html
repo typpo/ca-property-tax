@@ -403,6 +403,10 @@
         let apnLookup;
         let disclaimer = '';
         switch(record.county.trim()) {
+          case 'BUT':
+            taxUrl = `https://common2.mptsweb.com/MBC/butte/tax/main/${record.apn}/2020/0000`;
+            countyStr = 'Butte';
+            break;
           case 'SM':
             taxUrl = `https://sanmateo-ca.county-taxes.com/public/search?search_query=${record.apn}&category=all`;
             countyStr = 'San Mateo';
