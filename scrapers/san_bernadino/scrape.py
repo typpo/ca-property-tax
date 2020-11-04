@@ -65,8 +65,6 @@ with open('/home/ian/Downloads/san_bernadino/sbdo.geojson') as f_in:
     with concurrent.futures.ThreadPoolExecutor(max_workers=CONNECTIONS) as executor:
         for line in f_in:
             count += 1
-            if count < 550000:
-                continue
             if count < 6:
                 # Skip geojson garbage
                 continue
