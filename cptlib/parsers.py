@@ -33,16 +33,15 @@ class Parser():
 
     for parcel in self.parcels:
       count += 1
-
       path = os.path.join(self.data_dir, parcel.html_file_path)
 
-      print(count)
+      print(count, path)
 
       try:
         with gzip.open(path, 'rt') as f_in:
           html = f_in.read()
       except FileNotFoundError:
-        print('-> HTML file not found')
+        print(count, '-> HTML file not found')
         continue
 
       if self._parse_html(parcel, html):
@@ -54,7 +53,7 @@ class Parser():
 
         continue
 
-      print('-> Could not parse file')
+      print(count, '-> Could not parse file')
 
   def _parse_html(self, parcel, html):
     """Should be overridden with specific parsing logic
@@ -99,7 +98,5 @@ class ParserMegabyte(Parser):
           print('--> Could not parse float')
       else:
           print("--> bad tax records on parcel")
-
-
 
     return False

@@ -77,8 +77,7 @@ class Parcel():
 
     # Lots of files in a single directory can cause performance to suffer
     # Create a multi-level directory structure based on APN values
-    #return os.path.join(apn[0:3], apn[3:6], '{}.htm.gz'.format(apn))
-    return os.path.join(apn[0:3], '{}.html.gz'.format(apn))
+    return os.path.join(apn[0:3], apn[3:6], '{}.htm.gz'.format(apn))
 
   @property
   def apn_clean(self):
@@ -120,7 +119,7 @@ class Parcels():
     Returns:
         str: Address
     """
-    return row[self.address_column]
+    return row[self.address_column] if self.address_column else None
 
   def _record_is_valid_parcel(self, row):
     """Check if the row/record is valid
@@ -174,7 +173,7 @@ class ParcelsCSV(Parcels):
           (as a dict) and return the centroid as `(lat, lng)`
         csv_file_path (str): CSV file path
     """
-    super().__init__( county_code, apn_column, address_column, centroid_fn)
+    super().__init__(county_code, apn_column, address_column, centroid_fn)
 
     self.csv_file = open(csv_file_path, encoding='utf-8-sig')
     self.csv_reader = csv.DictReader(self.csv_file)
