@@ -20,6 +20,7 @@ files=(
   san_luis_obispo.csv.gz
   fresno.csv.gz
   butte.csv.gz
+  orange.csv.gz
 )
 
 cat "${files[@]}" > ca_all.csv.gz
