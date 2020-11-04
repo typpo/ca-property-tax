@@ -25,6 +25,7 @@ class Parser():
     csv_fieldnames = ['address', 'apn', 'longitude', 'latitude', 'tax',
                       'county']
     self.csv_writer = csv.DictWriter(self.csv_file, fieldnames=csv_fieldnames)
+    self.csv_writer.writeheader()
 
   def parse(self):
     """Execute the parser. Loop through Parcels and parse local HTML files.

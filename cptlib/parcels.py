@@ -34,8 +34,9 @@ def centroidfn_from_shape(shape_field = 'points'):
     if not points:
       return None
 
-    centroid = list(Polygon(points).centroid.coords)[0]
-    return (centroid[0], centroid[1])
+    centroid_xy = list(Polygon(points).centroid.coords)[0]
+    # latitude is y, longitude is x
+    return (centroid_xy[1], centroid_xy[0])
 
   return centroid_fn
 
