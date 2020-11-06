@@ -50,6 +50,8 @@ class Scraper():
     start_times = deque(maxlen=concur)
     expected_time = concur / max(self.request_avg_qps, 15)
 
+    print('Scraping {} parcels'.format(len(self.parcels)))
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=concur) as executor:
       for parcel in self.parcels:
         if len(futures) > concur:
@@ -75,7 +77,7 @@ class Scraper():
         #   before launching the thread.
         path = os.path.join(self.data_dir, parcel.html_file_path)
 
-        print(count, parcel.apn, path)
+        print(count, parcel.apn)
 
         # Check if the file already exists
         if os.path.exists(path):

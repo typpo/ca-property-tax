@@ -20,6 +20,9 @@ class Parser():
     self.parcels = parcels_generator
     self.data_dir = data_dir
 
+    # set this to a value to test parsing on only x files
+    self.test_limit = None
+
     csv_file_path = os.path.join(data_dir, 'output.csv')
     self.csv_file = open(csv_file_path, 'w')
     csv_fieldnames = ['address', 'apn', 'longitude', 'latitude', 'tax',
@@ -32,11 +35,19 @@ class Parser():
     """
     count = 0
 
+    print('Scraping {} parcels'.format(len(self.parcels)))
+
     for parcel in self.parcels:
       count += 1
+
+      # Break out of loop after a specific number for testing purposes
+      if self.test_limit and count > self.test_limit:
+        print('*** Exiting after test limit of {}'.format(self.test_limit))
+        break
+
       path = os.path.join(self.data_dir, parcel.html_file_path)
 
-      print(count, path)
+      #print(count, path)
 
       try:
         with gzip.open(path, 'rt') as f_in:
@@ -44,6 +55,9 @@ class Parser():
       except FileNotFoundError:
         print(count, '-> HTML file not found')
         continue
+
+      if count % 500 == 0:
+        print('Parsed {} records ({:.0%})'.format(count, count / len(self.parcels)))
 
       if self._parse_html(parcel, html):
         self.csv_writer.writerow(parcel.csv_row)
@@ -55,6 +69,7 @@ class Parser():
         continue
 
       print(count, '-> Could not parse file')
+
 
   def _parse_html(self, parcel, html):
     """Should be overridden with specific parsing logic

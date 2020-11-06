@@ -107,6 +107,8 @@ class Parcels():
     self.address_column = address_column
     self.centroid_fn = centroid_fn
 
+    self.length = 0
+
     self.valid_apn_pattern = None
 
   def _get_address(self, row):
@@ -153,9 +155,15 @@ class Parcels():
                   row[self.apn_column], self.centroid_fn(row))
 
   def __iter__(self):
-    """I'm an interator
+    """I'm an interator!
     """
     return self
+
+  def __next__(self):
+    raise NotImplementedError
+
+  def __len__(self):
+    return self.length
 
 
 
@@ -177,6 +185,11 @@ class ParcelsCSV(Parcels):
     super().__init__(county_code, apn_column, address_column, centroid_fn)
 
     self.csv_file = open(csv_file_path, encoding='utf-8-sig')
+    # length is # of rows minus header row
+    self.length = sum(1 for line in self.csv_file) - 1
+
+    # reset the file before creating dictreader
+    self.csv_file.seek(0)
     self.csv_reader = csv.DictReader(self.csv_file)
 
   def __next__(self):
@@ -216,6 +229,7 @@ class ParcelsShapefile(Parcels):
     super().__init__(county_code, apn_column, address_column, centroid_fn)
 
     self.sf = shapefile.Reader(shape_file_path)
+    self.length = len(self.sf)
     self.idx = 0
 
     # we only know how to deal with polygons
