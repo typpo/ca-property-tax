@@ -8,7 +8,7 @@ import re
 
 import requests
 
-CONNECTIONS = 10
+CONNECTIONS = 5
 
 def process_apn(count, apn, output_path):
     print(count, 'Processing', apn)
@@ -23,7 +23,8 @@ def process_apn(count, apn, output_path):
     html = resp.text
     if html.find(f'>{apn}</td>') < 0:
         print('-> bad resp, couldnt find', apn)
-        return
+        #return
+
     with gzip.open(output_path, 'wt') as f_out:
         f_out.write(html)
         f_out.flush()
@@ -44,7 +45,7 @@ with open('/home/ian/Downloads/riverside/riverside.geojson') as f_in:
                 print('End of json')
                 break
             apn = record['properties']['APN']
-            if not apn:
+            if apn == 'RW' or not apn:
                 continue
 
             output_path = '/home/ian/code/prop13/scrapers/riverside/scrape_output/%s.html' % (apn)
