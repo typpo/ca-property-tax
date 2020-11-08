@@ -489,6 +489,17 @@
             taxUrl = `http://tax.ocgov.com/tcweb/detail_sec.asp?ReqParcel=${record.apn}&StreetNo=&Direction=&StreetName=&APN=${apnLookup}&Suffix=00&CmpRevDte=79799276&RollTypCde=Secured&Code=A&StSuffix=&City=&Unit=&s=1&p=1&t=&TaxYr=2020&CurYr=2020`;
             countyStr = 'Orange County';
             break;
+          case 'PL':
+            apnLookup = record.apn.replace(/-/g, '');
+            taxUrl = `https://common3.mptsweb.com/MBC/placer/tax/main/${apnLookup}/2020/0000`;
+            countyStr = 'Placer';
+            break;
+          case 'KE':
+            apnLookup = record.apn.replace(/-/g, '');
+            taxUrl = 'https://www.kcttc.co.kern.ca.us/Payment/MainSearch.aspx';
+            disclaimer = `<br>Assessor Tax Number ${record.apn}`;
+            countyStr = 'Kern';
+            break;
         }
         const realEstateQuery = `${record.address}, ${countyStr} CA (site:zillow.com OR site:redfin.com)`;
         const popupContent = `
