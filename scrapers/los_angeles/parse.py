@@ -8,7 +8,7 @@ import sys
 
 csv.field_size_limit(sys.maxsize)
 
-AMOUNT_REGEX = re.compile('installmentmoney fakeform\'>\$([,\.\d]+)</td>')
+AMOUNT_REGEX = re.compile('<td>Tax Amount</td>\s+<td class=\'installmentmoney fakeform\'>\$([,\.\d]+)</td>')
 
 def get_val(row, key):
     val = row[key].strip()
@@ -53,8 +53,8 @@ with open('/home/ian/Downloads/LA_County_Parcels.csv') as f_in, \
 
         amount = -1
         try:
-            amount_str = AMOUNT_REGEX.search(html).group(1).replace(',', '')
-            amount = float(amount_str)
+            amount_strs = AMOUNT_REGEX.findall(html)
+            amount = sum([float(s.replace(',', '')) for s in amount_strs])
         except:
             print('--> Could not parse float', amount_str)
             continue
@@ -75,6 +75,6 @@ with open('/home/ian/Downloads/LA_County_Parcels.csv') as f_in, \
             'apn': apn,
             'latitude': lat,
             'longitude': lng,
-            'tax': amount * 2,
+            'tax': amount,
             'county': 'LA',
         })
