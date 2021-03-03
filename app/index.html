@@ -175,7 +175,7 @@
   <p>
     <strong>Other options</strong>
     <ul>
-      <li><a href="?commercial=1">View commercial properties only</a> - only available for Alameda and LA counties</li>
+      <li><a href="?commercial=1">View commercial properties only</a> - only available for Alameda, LA, and Riverside counties</li>
     </ul>
   </p>
 </div>
@@ -499,6 +499,12 @@
             taxUrl = 'https://www.kcttc.co.kern.ca.us/Payment/MainSearch.aspx';
             disclaimer = `<br>Assessor Tax Number ${record.apn}`;
             countyStr = 'Kern';
+            break;
+          case 'RS':
+            apnLookup = record.apn.replace(/-/g, '');
+            taxUrl = `https://ca-riverside-ttc.publicaccessnow.com/AccountSearch/AccountSummary.aspx?p=${apnLookup}&a=${apnLookup}&m=`;
+            disclaimer = `<br>Parcel Number ${record.apn}`;
+            countyStr = 'Riverside';
             break;
         }
         const realEstateQuery = `${record.address}, ${countyStr} CA (site:zillow.com OR site:redfin.com)`;

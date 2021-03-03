@@ -23,6 +23,7 @@ files=(
   orange.csv.gz
   placer.csv.gz
   kern.csv.gz
+  riverside.csv.gz
 )
 
 cat "${files[@]}" > ca_all.csv.gz
