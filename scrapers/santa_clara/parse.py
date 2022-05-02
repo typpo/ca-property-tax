@@ -13,7 +13,7 @@ from shapely.geometry import Polygon
 csv.field_size_limit(sys.maxsize)
 
 ADDRESS_REGEX = re.compile('name="situsLine1" type="hidden" value="(.*)"')
-AMOUNT_REGEX = re.compile('amountduecolumn.*\n\s+\$([\d,\.]+)')
+AMOUNT_REGEX = re.compile('amountduecolumn.*\n\s*\$([\d,\.]+)')
 
 with open('/home/ian/Downloads/Santa_Clara_Parcels.csv') as f_in, \
      open('./parse_output.csv', 'w') as f_out:
