@@ -6,10 +6,11 @@ import json
 import os
 import sys
 
-import requests
+import cloudscraper
 from shapely.geometry import Polygon
 
 csv.field_size_limit(sys.maxsize)
+scraper = cloudscraper.create_scraper()
 
 with open('/home/ian/Downloads/Santa_Clara_Parcels.csv') as f_in:
     count = 0
@@ -35,7 +36,7 @@ with open('/home/ian/Downloads/Santa_Clara_Parcels.csv') as f_in:
         retries = 0
         while True:
             try:
-                resp = requests.post('https://payments.sccgov.org/propertytax/Secured', params={
+                resp = scraper.post('https://payments.sccgov.org/propertytax/Secured', params={
                     'ParcelNumber': apn,
                 })
                 break

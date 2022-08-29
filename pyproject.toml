@@ -14,6 +14,7 @@ pyppeteer = "^0.2.2"
 pyproj = "^2.6.1"
 pandas = "^1.1.5"
 geopandas = "^0.8.1"
+cloudscraper = "^1.2.63"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^20.8b1", allow-prereleases = true}
