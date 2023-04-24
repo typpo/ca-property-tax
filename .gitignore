@@ -3,6 +3,7 @@
 *.geojson
 *.geojson.gz
 scrapers/*/scrape_output/*.html
+scrapers/*/data/
 venv
 
 ### Allow example data ###
