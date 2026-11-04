@@ -56,6 +56,8 @@ Some counties struggle to serve traffic or will rate limit.  It's important that
 
 A simple node app hosts the map and a `/lookup` endpoint.  On start it loads all parsed data into a geospatial index.  Install node dependencies with `yarn install`, populate the dataset with `yarn populate`, and then run the app with `yarn start`.  Then access via http://localhost:13000
 
+The Basic map uses OpenStreetMap tiles without an API key. Keep the visible attribution and follow the [tile usage policy](https://operations.osmfoundation.org/policies/tiles/). At zoom 20, Leaflet enlarges the zoom-19 tiles.
+
 ## TODO
 
 - Add support for more counties
